@@ -9,7 +9,8 @@ VALAFLAGS = $(patsubst %, --pkg %, $(PACKAGES)) -X -fPIC -X -shared --library=$(
 
 SOURCES = src/CaptureDocklet.vala\
 		src/CaptureDockItem.vala\
-		src/CapturePreferences.vala
+		src/CapturePreferences.vala\
+		src/ScreenGrabber.vala
 
 UIFILES =
 
