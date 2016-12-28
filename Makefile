@@ -2,7 +2,7 @@ PRG = libdocklet-capture.so
 CC = gcc
 VALAC = valac
 PKGCONFIG = $(shell which pkg-config)
-PACKAGES = gtk+-3.0 plank
+PACKAGES = gtk+-3.0 plank granite
 CFLAGS = `$(PKGCONFIG) --cflags $(PACKAGES)`
 LIBS = `$(PKGCONFIG) --libs $(PACKAGES)`
 VALAFLAGS = $(patsubst %, --pkg %, $(PACKAGES)) -X -fPIC -X -shared --library=$(PRG)
@@ -10,7 +10,8 @@ VALAFLAGS = $(patsubst %, --pkg %, $(PACKAGES)) -X -fPIC -X -shared --library=$(
 SOURCES = src/CaptureDocklet.vala\
 		src/CaptureDockItem.vala\
 		src/CapturePreferences.vala\
-		src/ScreenGrabber.vala
+		src/ScreenGrabber.vala\
+		src/RegionSelect.vala
 
 UIFILES =
 

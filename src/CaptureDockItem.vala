@@ -15,6 +15,7 @@ namespace Capture {
 			Logger.DisplayLevel = LogLevel.NOTIFY;
 
 			grabber = new ScreenGrabber();
+			grabber.mode = ScreenGrabMode.REGION;
 
 			unowned CapturePreferences prefs = (CapturePreferences) Prefs;
 
@@ -22,6 +23,11 @@ namespace Capture {
 			Text = "Capture something";
 
 			updated();
+
+			// Test / Debug
+
+			var screen = Gdk.Screen.get_default();
+			Logger.notification("Screen dimensions: %ux%u".printf(screen.get_width(), screen.get_height()));
 		}
 
 
@@ -35,7 +41,7 @@ namespace Capture {
 			var item = create_menu_item("Screenshot", "", true);
 			item.activate.connect( () => {
 
-				int countdown = 3;
+				int countdown = 1;
 
 				CountVisible = true;
 				ProgressVisible = true;

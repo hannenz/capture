@@ -1,4 +1,5 @@
 using Gdk;
+using Plank;
 
 namespace Capture {
 
@@ -33,8 +34,15 @@ namespace Capture {
 					break;
 
 				case ScreenGrabMode.WINDOW:
-					window = default_screen.get_active_window();
+					// Todo: get_acive_window() is deprecated. Find an alternative!
+					/* window = default_screen.get_active_window(); */
 					break;
+
+				case ScreenGrabMode.REGION:
+					var region_select = new RegionSelect();
+					region_select.present();
+					break;
+
 				default:
 					break;
 			}
