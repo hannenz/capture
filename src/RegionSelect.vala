@@ -18,13 +18,10 @@ namespace Capture {
 		MOVE
 	}
 
-	/* public class RegionSelect : Granite.Widgets.CompositedWindow { */
-	public class RegionSelect : Gtk.Window {
+	public class RegionSelect : Granite.Widgets.CompositedWindow {
+	/* public class RegionSelect : Gtk.Window { */
 
 		protected Gtk.DrawingArea drawing_area;
-		protected Gdk.RGBA fgcol;
-		protected Gdk.RGBA bgcol;
-		protected Gdk.RGBA white;
 		protected Gdk.Device mouse;
 		protected Gdk.Window gwin;
 
@@ -33,43 +30,52 @@ namespace Capture {
 		private int delta_y;
 
 		public Gdk.Rectangle selection;
-		
+
+		public signal void selected(Gdk.Rectangle? selection);
+
+		construct {
+			resizable = true;
+		}
+
+		/**
+		  * Constructor
+		  */
 		public RegionSelect() {
 
-
-			Logger.notification("RegionSelect() constructor");
-
+			// TODO: Place default selection in center of screen
 			selection = Gdk.Rectangle();
 			selection.x = 100;
 			selection.y = 100;
 			selection.width = 200;
-			selection.height = 150;
+			selection.height = 200;
 			
-			fgcol.red = 0.9;
-			fgcol.green = 0;
-			fgcol.blue = 0;
-			fgcol.alpha = 1.0;
-			bgcol.red = bgcol.green = bgcol.blue = 0.2;
-			bgcol.alpha = 0.5;
-			white.red = white.green = white.blue = white.alpha = 1.0;
-
 			drawing_area = new Gtk.DrawingArea();
 			drawing_area.draw.connect(on_draw);
 			drawing_area.add_events(Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_MOTION_MASK | Gdk.EventMask.BUTTON1_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK);
-			
 			add(drawing_area);
+
 			fullscreen();
 			set_modal(true);
-
-			var screen = Gdk.Screen.get_default();
-			set_default_size(screen.get_width(), screen.get_height());
-			resize(screen.get_width(), screen.get_height());
 
 			var display = Display.get_default();
 			var manager = display.get_device_manager();
 			mouse = manager.get_client_pointer();
 
 			status = DragStatus.NONE;
+
+			Gdk.Cursor[] cursors = {
+				new Gdk.Cursor.from_name(display, "default"),
+				new Gdk.Cursor.from_name(display, "nw-resize"),
+				new Gdk.Cursor.from_name(display, "ne-resize"),
+				new Gdk.Cursor.from_name(display, "se-resize"),
+				new Gdk.Cursor.from_name(display, "sw-resize"),
+				new Gdk.Cursor.from_name(display, "n-resize"),
+				new Gdk.Cursor.from_name(display, "e-resize"),
+				new Gdk.Cursor.from_name(display, "s-resize"),
+				new Gdk.Cursor.from_name(display, "w-resize"),
+				new Gdk.Cursor.from_name(display, "move")
+			};
+
 
 			drawing_area.button_press_event.connect( (context) => {
 				int x, y;
@@ -125,35 +131,34 @@ namespace Capture {
 				/* Gdk.get_default_root_window().get_device_position(mouse, out x, out y, null); */
 				gwin.get_device_position(mouse, out x, out y, null);
 				if ( is_near(x, y, selection.x, selection.y, 30)) {
-					gwin.set_cursor(new Gdk.Cursor.from_name(display, "nw-resize"));
+					gwin.set_cursor(cursors[DragStatus.NORTHWEST]);
 				}
 				else if (is_near(x, y, selection.x + selection.width, selection.y, 30)) {
-					gwin.set_cursor(new Gdk.Cursor.from_name(display, "ne-resize"));
+					gwin.set_cursor(cursors[DragStatus.NORTHEAST]);
 				}
 				else if (is_near(x, y, selection.x + selection.width, selection.y + selection.height, 30)) {  
-					gwin.set_cursor(new Gdk.Cursor.from_name(display, "se-resize"));
+					gwin.set_cursor(cursors[DragStatus.SOUTHEAST]);
 				}
 				else if (is_near(x, y, selection.x, selection.y + selection.height, 30)) {
-					gwin.set_cursor(new Gdk.Cursor.from_name(display, "sw-resize"));
+					gwin.set_cursor(cursors[DragStatus.SOUTHWEST]);
 				}
 				else if (x >= selection.x && x < selection.x + selection.width && y > selection.y && y < selection.y + selection.height) {
-					gwin.set_cursor(new Gdk.Cursor.from_name(display, "move"));
+					gwin.set_cursor(cursors[DragStatus.MOVE]);
 				}
 				else if (x >= selection.x - 15 && x <= selection.x + 15) {
-					gwin.set_cursor(new Gdk.Cursor.from_name(display, "w-resize"));
+					gwin.set_cursor(cursors[DragStatus.WEST]);
 				}
 				else if (x >= selection.x + selection.width - 15 && x <= selection.x + selection.width + 15) {
-					gwin.set_cursor(new Gdk.Cursor.from_name(display, "e-resize"));
+					gwin.set_cursor(cursors[DragStatus.EAST]);
 				}
 				else if (y >= selection.y + selection.height - 15 && y <= selection.y + selection.height + 15) {
-					gwin.set_cursor(new Gdk.Cursor.from_name(display, "s-resize"));
+					gwin.set_cursor(cursors[DragStatus.SOUTH]);
 				}
 				else if (y >= selection.y - 15 && y <= selection.y + 15) {
-					gwin.set_cursor(new Gdk.Cursor.from_name(display, "n-resize"));
+					gwin.set_cursor(cursors[DragStatus.NORTH]);
 				}
-
 				else {
-					gwin.set_cursor(new Gdk.Cursor.from_name(display, "pointer"));
+					gwin.set_cursor(cursors[DragStatus.NONE]);
 				}
 				
 				switch (status) {
@@ -178,14 +183,10 @@ namespace Capture {
 						selection.x = x;
 						break;
 					case DragStatus.MOVE:
-						/* selection.x += x - selection.x; */
-						/* selection.y += y - selection.y; */
 						selection.x = x - delta_x;
 						selection.y = y - delta_y;
 						break;
 					case DragStatus.NORTH:
-						Logger.notification("Going NORTH");
-						/* selection.height = selection.y + selection.height - y; */
 						selection.height += selection.y - y;
 						selection.y = y;
 						break;
@@ -196,21 +197,15 @@ namespace Capture {
 						selection.width = x - selection.x;
 						break;
 					case DragStatus.WEST:
-						/* selection.width = selection.x + selection.width - x; */
 						selection.width += selection.x - x;
 						selection.x = x;
 						break;
-
 				}
-
-				/* Logger.notification("%d %d %d %d".printf(selection.x, selection.y, selection.width, selection.height)); */
-
 
 				if (status != DragStatus.NONE) {
-					/* selection.width = x - selection.x; */
-					/* selection.height = y - selection.y; */
 					drawing_area.queue_draw();
 				}
+
 				return true;
 			});
 
@@ -230,9 +225,32 @@ namespace Capture {
 			});
 
 
-			int width, height;
-			get_size(out width, out height);
-			Logger.notification("%ux%u".printf(width, height));
+			this.add_events(EventMask.KEY_PRESS_MASK);
+			this.key_press_event.connect( (event_key) => {
+				switch (event_key.keyval) {
+					case Gdk.Key.Up:
+						break;
+					case Gdk.Key.Right:
+						break;
+					case Gdk.Key.Down:
+						break;
+					case Gdk.Key.Left:
+						break;
+					case Gdk.Key.Return:
+						selected(selection);
+						break;
+					case Gdk.Key.space:
+						selected(selection);
+						break;
+					case Gdk.Key.Escape:
+						selected(null);
+						break;
+					default:
+						selected(null);
+						break;
+				}
+				return true;
+			});
 
 			show_all();
 			gwin = this.get_toplevel().get_window();
@@ -253,35 +271,19 @@ namespace Capture {
 
 		protected bool on_draw(Context ctx) {
 
-			/* Pattern pat = new Pattern.rgba(0.2, 0.2, 0.2, 0.5); */
-
-			ctx.rectangle(selection.x, selection.y, selection.width, selection.height);
-			ctx.clip();
-			ctx.new_path();
-
 			int width, height;
 			get_size(out width, out height);
-			Gdk.cairo_set_source_rgba(ctx, bgcol);
-			ctx.rectangle(0, 0, width, height);
+			ctx.set_source_rgba(0.1, 0.1, 0.1, 0.5);
+			ctx.rectangle(0, 0, width, selection.y);
 			ctx.fill();
-			return true;
+			ctx.rectangle(0, selection.y + selection.height, width, height - selection.height - selection.y);
+			ctx.fill();
+			ctx.rectangle(0, selection.y,  selection.x, selection.height);
+			ctx.fill();
+			ctx.rectangle(selection.x + selection.width, selection.y,  width - selection.x - selection.width, selection.height);
+			ctx.fill();
 
-			// Draw overlay rectangle (full window dimensions)
-			/* int width, height; */
-			/* get_size(out width, out height); */
-			/* Gdk.cairo_set_source_rgba(ctx, bgcol); */
-			/* ctx.rectangle(0, 0, width, height); */
-			/* ctx.fill(); */
-            /*  */
-			/* Gdk.cairo_set_source_rgba(ctx, fgcol); */
-			/* ctx.rectangle(selection.x, selection.y, selection.width, selection.height); */
-			/* ctx.stroke(); */
-            /*  */
-			/* Gdk.cairo_set_source_rgba(ctx, white); */
-			/* ctx.rectangle(selection.x, selection.y, selection.width, selection.height); */
-			/* ctx.fill(); */
-			/*  */
-			/* return true; */
+			return true;
 		}
 	}
 }

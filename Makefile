@@ -2,7 +2,7 @@ PRG = libdocklet-capture.so
 CC = gcc
 VALAC = valac
 PKGCONFIG = $(shell which pkg-config)
-PACKAGES = gtk+-3.0 plank granite
+PACKAGES = gtk+-3.0 plank granite libnotify
 CFLAGS = `$(PKGCONFIG) --cflags $(PACKAGES)`
 LIBS = `$(PKGCONFIG) --libs $(PACKAGES)`
 VALAFLAGS = $(patsubst %, --pkg %, $(PACKAGES)) -X -fPIC -X -shared --library=$(PRG)

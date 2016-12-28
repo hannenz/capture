@@ -5,13 +5,14 @@ namespace Capture {
 		[Description(nick = "framerate", blurb="Framerate for screen capture")]
 		public uint framerate;
 
-
-		public uint countdown;
+		public int countdown;
 
 		public string file_format;
 
 		public string destination;
 
+
+		public bool show_notifications;
 
 
 		public CapturePreferences.with_file(GLib.File file) {
@@ -23,6 +24,7 @@ namespace Capture {
 			countdown = 3;
 			file_format = "png";
 			destination = Environment.get_home_dir();
+			show_notifications = true;
 		}
 	}
 }
