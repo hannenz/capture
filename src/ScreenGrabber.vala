@@ -25,10 +25,16 @@ namespace Capture {
 
 
 		public ScreenGrabber(ScreenGrabMode mode) {
+			
 			this.mode = mode;
+
+		}
+
+		public Pixbuf grab(Gdk.Rectangle? selection) {
 
 			default_display = Display.get_default();
 			default_screen = default_display.get_default_screen();
+			// FIXME!!!! Use real cursor!
 			var crsr = new Gdk.Cursor.for_display(default_display, Gdk.CursorType.LEFT_PTR);
 			cursor_pixbuf = crsr.get_image();
 			if (cursor_pixbuf == null) {
@@ -45,30 +51,23 @@ namespace Capture {
 
 				case ScreenGrabMode.WINDOW:
 					// Todo: get_acive_window() is deprecated. Find an alternative!
-					/* window = default_screen.get_active_window(); */
+					window = default_screen.get_active_window();
 					break;
 
 				case ScreenGrabMode.REGION:
-					var region_select = new RegionSelect();
-					region_select.selected.connect( (selection) => {
-						
-						region_select.destroy();
-						if (selection != null) {
-							window = Gdk.get_default_root_window();
-							pixbuf = Gdk.pixbuf_get_from_window(window, selection.x, selection.y, selection.width, selection.height);
+					if (selection != null) {
+						window = Gdk.get_default_root_window();
+						pixbuf = Gdk.pixbuf_get_from_window(window, selection.x, selection.y, selection.width, selection.height);
 
-							Logger.notification("Adding cursor");
-							Gdk.get_default_root_window().get_device_position(Display.get_default().get_device_manager().get_client_pointer(), out cursor_x, out cursor_y, null);
-							int dx = cursor_x - selection.x;
-							int dy = cursor_y - selection.y;
-							Logger.notification("dx = %u, dy = %u".printf(dx, dy));
-							cursor_pixbuf.composite(pixbuf, 0, 0, pixbuf.get_width(), pixbuf.get_height(), dx - 6, dy - 6, 1.0, 1.0, InterpType.BILINEAR, 255);
-						}
+						Logger.notification("Adding cursor");
+						Gdk.get_default_root_window().get_device_position(Display.get_default().get_device_manager().get_client_pointer(), out cursor_x, out cursor_y, null);
+						int dx = cursor_x - selection.x;
+						int dy = cursor_y - selection.y;
+						Logger.notification("dx = %u, dy = %u".printf(dx, dy));
+						cursor_pixbuf.composite(pixbuf, 0, 0, pixbuf.get_width(), pixbuf.get_height(), dx - 6, dy - 6, 1.0, 1.0, InterpType.BILINEAR, 255);
+					}
 
-						grabbed(pixbuf);
-					});
-
-					region_select.present();
+					grabbed(pixbuf);
 					break;
 
 				default:
@@ -77,8 +76,10 @@ namespace Capture {
 
 			if (pixbuf == null) {
 				pixbuf = Gdk.pixbuf_get_from_window(window, 0, 0, window.get_width(), window.get_height());
+				grabbed(pixbuf);
 			}
-			grabbed(pixbuf);
+
+			return pixbuf;
 		}
 
 		public ScreenGrabber.from_region () {
@@ -93,8 +94,6 @@ namespace Capture {
 			this(ScreenGrabMode.DESKTOP);
 		}
 
-		private void add_cursor() {
-		}
 
 		/* public void take_screencapture() { */
 		/* } */

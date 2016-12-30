@@ -1,15 +1,16 @@
 using Plank;
 using Notify;
+using Gdk;
 using Gtk;
 
 namespace Capture {
 
 	public class CaptureDockItem : DockletItem {
 
-		
 		private unowned CapturePreferences prefs;
-
+		private ScreenGrabMode mode;
 		private Gtk.Clipboard clipboard;
+		private Gdk.Rectangle? selection;
 
 
 		public CaptureDockItem.with_dockitem_file(GLib.File file) {
@@ -28,47 +29,29 @@ namespace Capture {
 			Notify.init("Capture Docklet");
 
 			clipboard = Gtk.Clipboard.get(Gdk.Atom.intern("CLIPBOARD", true));
+
+			mode = ScreenGrabMode.DESKTOP;
+			selection = null;
 		}
 
 		public override Gee.ArrayList<Gtk.MenuItem> get_menu_items() {
 			var items = new Gee.ArrayList<Gtk.MenuItem>();
 			
-			var item = create_menu_item("Screenshot region", "", true);
+			var item = create_menu_item("Screenshot Region", "", true);
 			item.activate.connect( () => {
+				take_screenshot(ScreenGrabMode.REGION);
+			});
+			items.add(item);
 
-				int countdown = 0;
+			item = create_menu_item("Screenshot Active Window", "", true);
+			item.activate.connect(() => {
+				take_screenshot(ScreenGrabMode.WINDOW);
+			});
+			items.add(item);
 
-				if (countdown == 0) {
-					shot();
-				}
-				else {
-
-					CountVisible = true;
-					ProgressVisible = true;
-
-					Count = countdown;
-					Progress = 0;
-					Timeout.add_seconds(1, () => {
-					
-						Count = --countdown;
-						Progress = (3.0 - (double)countdown) / 3.0;
-
-						switch (countdown) {
-							case 0:
-								shot();
-								return true;
-
-							case -1:
-								CountVisible = false;
-								ProgressVisible = false;
-								return false;
-
-							default:
-								Logger.notification("%.2f".printf(Progress));
-								return true;
-						}
-					}, Priority.DEFAULT);
-				}
+			item = create_menu_item("Screenshot Desktop", "", true);
+			item.activate.connect( () => {
+				take_screenshot(ScreenGrabMode.DESKTOP);
 			});
 			items.add(item);
 
@@ -87,77 +70,129 @@ namespace Capture {
 			return items;
 		}
 
-		protected void shot() {
+		protected void take_screenshot(ScreenGrabMode? mode) {
 
-			var grabber = new ScreenGrabber.from_region();
-			grabber.grabbed.connect( (pixbuf) => {
-				
-				if (pixbuf == null) {
-					Logger.notification("Aborted.");
-					return;
-				}
+			if (mode != null) {
+				this.mode = mode;
+			}
+			RegionSelect region_select = null;
+			selection = null;
 
-				var now = new DateTime.now_local();
-				string name = "%s%s.%s".printf("capture-", now.to_string(), "png");
-				string filename = null;
+			if (this.mode == ScreenGrabMode.REGION) {
+				region_select = new RegionSelect();
+				selection = region_select.run();
+			}
 
-				if (prefs.auto_save) {
+			ProgressVisible = true;
+			CountVisible = true;
+			Count = prefs.countdown;
+			Progress = 0;
+			
+			Logger.notification("prefs.countdown = %u".printf(prefs.countdown));
+			var countdown = new Countdown(prefs.countdown);
 
-					filename = Path.build_path(
-						Path.DIR_SEPARATOR_S, 
-						prefs.destination,
-						name
-					);
-				}
-				else {
-					var chooser = new FileChooserDialog("Select destination to save the capture", null, FileChooserAction.SAVE, "_Cancel", ResponseType.CANCEL, "_Save", ResponseType.ACCEPT);
-					chooser.set_current_name(name);
-					if (chooser.run() == ResponseType.ACCEPT) {
-						filename = chooser.get_filename();
-					}
-					chooser.destroy();
-				}
-				
-				if (filename != null) {
-					Logger.notification("Saving Screenshot to %s".printf(filename));
-
-					try {
-						pixbuf.save(filename, "png");
-
-
-						if (prefs.show_notifications) {
-							var notification = new Notify.Notification("Screenshot has been saved", filename, "dialog-information");
-							notification.set_image_from_pixbuf(pixbuf);
-							/* notification.add_action("action-name", "Open", (notification, action) => { */
-							/* 	try { */
-							/* 		notification.close(); */
-							/* 	} */
-							/* 	catch (Error e) { */
-							/* 		warning(e.message); */
-							/* 	} */
-								// Launch system image viewer
-							/* }); */
-							notification.show();
-
-							AppInfo appinfo = AppInfo.get_default_for_type("image/png", true);
-							Logger.notification(appinfo.get_name());
-							Logger.notification(appinfo.get_commandline());
-							var files = new List<File>();
-							files.append(GLib.File.new_for_path(filename));
-							appinfo.launch(files, null);
-						}
-
-					}
-					catch (Error e) {
-						warning(e.message);
-					}
-				}
-
-				if (prefs.copy_to_clipboard) {
-					clipboard.set_image(pixbuf);
-				}
-				
+			countdown.tick.connect( (second, progress) => {
+				Count = second;
+				Progress = progress;
 			});
+
+			countdown.ignition.connect( () => {
+				if (this.mode == ScreenGrabMode.REGION) {
+					region_select.destroy();
+				}
+				shot();
+				ProgressVisible = false;
+				CountVisible = false;
+			});
+			countdown.start();
+		}
+
+
+		protected void shot() {
+			
+			ScreenGrabber grabber;
+			Pixbuf pixbuf;
+
+			switch (mode) {
+				case ScreenGrabMode.REGION:
+					grabber = new ScreenGrabber.from_region();
+					break;
+				case ScreenGrabMode.WINDOW:
+					grabber = new ScreenGrabber.from_window();
+					break;
+				case ScreenGrabMode.DESKTOP:
+					grabber = new ScreenGrabber.from_desktop();
+					break;
+				default:
+					warning ("Illegal ScreenGrabMode: %u", mode);
+					return;
+			}
+			
+			pixbuf = grabber.grab(selection);
+			if (pixbuf == null) {
+				Logger.notification("Aborted.");
+				return;
+			}
+
+			var now = new DateTime.now_local();
+			string name = "%s%s.%s".printf("capture-", now.to_string(), "png");
+			string filename = null;
+
+			if (prefs.auto_save) {
+
+				filename = Path.build_path(
+					Path.DIR_SEPARATOR_S, 
+					prefs.destination,
+					name
+				);
+			}
+			else {
+				var chooser = new FileChooserDialog("Select destination to save the capture", null, FileChooserAction.SAVE, "_Cancel", ResponseType.CANCEL, "_Save", ResponseType.ACCEPT);
+				chooser.set_current_name(name);
+				if (chooser.run() == ResponseType.ACCEPT) {
+					filename = chooser.get_filename();
+				}
+				chooser.destroy();
+			}
+			
+			if (filename != null) {
+				Logger.notification("Saving Screenshot to %s".printf(filename));
+
+				try {
+					pixbuf.save(filename, "png");
+
+
+					if (prefs.show_notifications) {
+						var notification = new Notify.Notification("Screenshot has been saved", filename, "dialog-information");
+						notification.set_image_from_pixbuf(pixbuf);
+						/* notification.add_action("action-name", "Open", (notification, action) => { */
+						/* 	try { */
+						/* 		notification.close(); */
+						/* 	} */
+						/* 	catch (Error e) { */
+						/* 		warning(e.message); */
+						/* 	} */
+							// Launch system image viewer
+						/* }); */
+						notification.show();
+
+						AppInfo appinfo = AppInfo.get_default_for_type("image/png", true);
+						Logger.notification(appinfo.get_name());
+						Logger.notification(appinfo.get_commandline());
+						var files = new List<File>();
+						files.append(GLib.File.new_for_path(filename));
+						appinfo.launch(files, null);
+					}
+
+				}
+				catch (Error e) {
+					warning(e.message);
+				}
+			}
+
+			if (prefs.copy_to_clipboard) {
+				clipboard.set_image(pixbuf);
+			}
 		}
 
 
@@ -167,7 +202,7 @@ namespace Capture {
 
 		protected override AnimationType on_clicked(PopupButton button, Gdk.ModifierType mod, uint32 event_time) {
 			if (button == PopupButton.LEFT) {
-				shot();
+				take_screenshot(null);
 				return AnimationType.BOUNCE;
 			}
 			return AnimationType.NONE;

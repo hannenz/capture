@@ -19,7 +19,6 @@ namespace Capture {
 	}
 
 	public class RegionSelect : Granite.Widgets.CompositedWindow {
-	/* public class RegionSelect : Gtk.Window { */
 
 		protected Gtk.DrawingArea drawing_area;
 		protected Gdk.Device mouse;
@@ -238,15 +237,19 @@ namespace Capture {
 						break;
 					case Gdk.Key.Return:
 						selected(selection);
+						Gtk.main_quit();
 						break;
 					case Gdk.Key.space:
 						selected(selection);
+						Gtk.main_quit();
 						break;
 					case Gdk.Key.Escape:
 						selected(null);
+						Gtk.main_quit();
 						break;
 					default:
 						selected(null);
+						Gtk.main_quit();
 						break;
 				}
 				return true;
@@ -254,6 +257,14 @@ namespace Capture {
 
 			show_all();
 			gwin = this.get_toplevel().get_window();
+		}
+
+		public Gdk.Rectangle? run() {
+			show_all();
+			present();
+			Gtk.main();
+			/* destroy(); */
+			return selection;
 		}
 
 		private bool is_near(int x1, int y1, int x2, int y2, int radius) {

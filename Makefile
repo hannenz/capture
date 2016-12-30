@@ -11,7 +11,8 @@ SOURCES = src/CaptureDocklet.vala\
 		src/CaptureDockItem.vala\
 		src/CapturePreferences.vala\
 		src/ScreenGrabber.vala\
-		src/RegionSelect.vala
+		src/RegionSelect.vala\
+		src/Countdown.vala
 
 UIFILES =
 
