@@ -1,5 +1,6 @@
 using Plank;
 using Notify;
+using Gtk;
 
 namespace Capture {
 
@@ -7,6 +8,8 @@ namespace Capture {
 
 		
 		private unowned CapturePreferences prefs;
+
+		private Gtk.Clipboard clipboard;
 
 
 		public CaptureDockItem.with_dockitem_file(GLib.File file) {
@@ -23,6 +26,8 @@ namespace Capture {
 			Text = "Capture something";
 
 			Notify.init("Capture Docklet");
+
+			clipboard = Gtk.Clipboard.get(Gdk.Atom.intern("CLIPBOARD", true));
 		}
 
 		public override Gee.ArrayList<Gtk.MenuItem> get_menu_items() {
@@ -88,56 +93,70 @@ namespace Capture {
 			grabber.grabbed.connect( (pixbuf) => {
 				
 				if (pixbuf == null) {
-					Logger.notification("Pixbuf is null");
 					Logger.notification("Aborted.");
-
 					return;
 				}
 
-
 				var now = new DateTime.now_local();
-				var filename = Path.build_path(
-					Path.DIR_SEPARATOR_S, 
-					Environment.get_home_dir(),
-					"%s%s.%s".printf(
-						"capture-", 
-						now.to_string(),
-						"png"
-					)
-				);
-				
-				Logger.notification("Saving Screenshot to %s".printf(filename));
+				string name = "%s%s.%s".printf("capture-", now.to_string(), "png");
+				string filename = null;
 
-				try {
-					pixbuf.save(filename, "png");
+				if (prefs.auto_save) {
 
-
-					if (prefs.show_notifications) {
-						var notification = new Notify.Notification("Screenshot has been saved", filename, "dialog-information");
-						notification.set_image_from_pixbuf(pixbuf);
-						/* notification.add_action("action-name", "Open", (notification, action) => { */
-						/* 	try { */
-						/* 		notification.close(); */
-						/* 	} */
-						/* 	catch (Error e) { */
-						/* 		warning(e.message); */
-						/* 	} */
-							// Launch system image viewer
-						/* }); */
-						notification.show();
-
-						AppInfo appinfo = AppInfo.get_default_for_type("image/png", true);
-						Logger.notification(appinfo.get_name());
-						Logger.notification(appinfo.get_commandline());
-						var files = new List<File>();
-						files.append(GLib.File.new_for_path(filename));
-						appinfo.launch(files, null);
+					filename = Path.build_path(
+						Path.DIR_SEPARATOR_S, 
+						prefs.destination,
+						name
+					);
+				}
+				else {
+					var chooser = new FileChooserDialog("Select destination to save the capture", null, FileChooserAction.SAVE, "_Cancel", ResponseType.CANCEL, "_Save", ResponseType.ACCEPT);
+					chooser.set_current_name(name);
+					if (chooser.run() == ResponseType.ACCEPT) {
+						filename = chooser.get_filename();
 					}
+					chooser.destroy();
+				}
+				
+				if (filename != null) {
+					Logger.notification("Saving Screenshot to %s".printf(filename));
 
+					try {
+						pixbuf.save(filename, "png");
+
+
+						if (prefs.show_notifications) {
+							var notification = new Notify.Notification("Screenshot has been saved", filename, "dialog-information");
+							notification.set_image_from_pixbuf(pixbuf);
+							/* notification.add_action("action-name", "Open", (notification, action) => { */
+							/* 	try { */
+							/* 		notification.close(); */
+							/* 	} */
+							/* 	catch (Error e) { */
+							/* 		warning(e.message); */
+							/* 	} */
+								// Launch system image viewer
+							/* }); */
+							notification.show();
+
+							AppInfo appinfo = AppInfo.get_default_for_type("image/png", true);
+							Logger.notification(appinfo.get_name());
+							Logger.notification(appinfo.get_commandline());
+							var files = new List<File>();
+							files.append(GLib.File.new_for_path(filename));
+							appinfo.launch(files, null);
+						}
+
+					}
+					catch (Error e) {
+						warning(e.message);
+					}
 				}
-				catch (Error e) {
-					warning(e.message);
+
+				if (prefs.copy_to_clipboard) {
+					clipboard.set_image(pixbuf);
 				}
+				
 			});
 		}
 
