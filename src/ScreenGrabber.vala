@@ -56,10 +56,14 @@ namespace Capture {
 						if (selection != null) {
 							window = Gdk.get_default_root_window();
 							pixbuf = Gdk.pixbuf_get_from_window(window, selection.x, selection.y, selection.width, selection.height);
-						}
 
-						Logger.notification("Adding cursor");
-						add_cursor();
+							Logger.notification("Adding cursor");
+							Gdk.get_default_root_window().get_device_position(Display.get_default().get_device_manager().get_client_pointer(), out cursor_x, out cursor_y, null);
+							int dx = cursor_x - selection.x;
+							int dy = cursor_y - selection.y;
+							Logger.notification("dx = %u, dy = %u".printf(dx, dy));
+							cursor_pixbuf.composite(pixbuf, 0, 0, pixbuf.get_width(), pixbuf.get_height(), dx - 6, dy - 6, 1.0, 1.0, InterpType.BILINEAR, 255);
+						}
 
 						grabbed(pixbuf);
 					});
@@ -90,7 +94,6 @@ namespace Capture {
 		}
 
 		private void add_cursor() {
-			cursor_pixbuf.composite(pixbuf, 10, 10, 100, 100, 0, 0, 1.0, 1.0, InterpType.BILINEAR, 255);
 		}
 
 		/* public void take_screencapture() { */
