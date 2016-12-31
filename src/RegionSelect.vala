@@ -60,7 +60,6 @@ namespace Capture {
 			var manager = display.get_device_manager();
 			mouse = manager.get_client_pointer();
 
-			status = DragStatus.NONE;
 
 			Gdk.Cursor[] cursors = {
 				new Gdk.Cursor.from_name(display, "default"),

@@ -11,6 +11,7 @@ namespace Capture {
 		private ScreenGrabMode mode;
 		private Gtk.Clipboard clipboard;
 		private Gdk.Rectangle? selection;
+		private Sequence sequence;
 
 
 		public CaptureDockItem.with_dockitem_file(GLib.File file) {
@@ -32,6 +33,8 @@ namespace Capture {
 
 			mode = ScreenGrabMode.DESKTOP;
 			selection = null;
+
+			sequence = new Sequence();
 		}
 
 		public override Gee.ArrayList<Gtk.MenuItem> get_menu_items() {
@@ -58,6 +61,7 @@ namespace Capture {
 			item = create_menu_item("Screen Capture", "", true);
 			item.activate.connect( () => {
 				Logger.notification("Screen Capture");
+				take_screencapture();
 			});
 			items.add(item);
 
@@ -195,6 +199,42 @@ namespace Capture {
 			}
 		}
 
+		protected void take_screencapture() {
+			sequence = new Sequence();
+
+			var region_select = new RegionSelect();
+			selection = region_select.run();
+
+			int nframes = 100;
+			var grabber = new ScreenGrabber(ScreenGrabMode.REGION);
+			Timeout.add(50, () => {
+				Logger.notification("Taking a screenshot frame");
+				sequence.add(grabber.grab(selection));
+				if (--nframes <= 0) {
+					region_select.destroy();
+					capture_preview();
+					return false;
+				}
+				return true;
+			}, Priority.DEFAULT);
+		}
+
+		protected void capture_preview() {
+			var dlg = new Gtk.Dialog();
+
+			var image = new Gtk.Image();
+			var content_area = dlg.get_content_area();
+			content_area.pack_start(image);
+
+			dlg.show_all();
+			Timeout.add(50, () => {
+				image.pixbuf = sequence.next();
+				return true;
+			});
+
+			dlg.run();
+			dlg.destroy();
+		}
 
 		protected override AnimationType on_scrolled(Gdk.ScrollDirection dir, Gdk.ModifierType mod, uint32 event_time) {
 			return AnimationType.NONE;
