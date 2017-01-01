@@ -35,7 +35,7 @@ namespace Capture {
 
 		protected override void reset_properties() {
 			framerate = 10;
-			countdown = 3;
+			countdown = 7;
 			file_format = "png";
 			destination = Environment.get_home_dir();
 			show_notifications = true;

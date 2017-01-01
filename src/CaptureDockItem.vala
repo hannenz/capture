@@ -34,7 +34,7 @@ namespace Capture {
 			mode = ScreenGrabMode.DESKTOP;
 			selection = null;
 
-			sequence = new Sequence();
+			/* sequence = new Sequence(); */
 		}
 
 		public override Gee.ArrayList<Gtk.MenuItem> get_menu_items() {
@@ -58,10 +58,19 @@ namespace Capture {
 			});
 			items.add(item);
 
-			item = create_menu_item("Screen Capture", "", true);
+			item = create_menu_item("Screen Capture Region", "", true);
 			item.activate.connect( () => {
-				Logger.notification("Screen Capture");
-				take_screencapture();
+				take_screencapture(ScreenGrabMode.REGION);
+			});
+			items.add(item);
+			item = create_menu_item("Screen Capture Active Window", "", true);
+			item.activate.connect( () => {
+				take_screencapture(ScreenGrabMode.WINDOW);
+			});
+			items.add(item);
+			item = create_menu_item("Screen Capture Desktop", "", true);
+			item.activate.connect( () => {
+				take_screencapture(ScreenGrabMode.DESKTOP);
 			});
 			items.add(item);
 
@@ -199,17 +208,28 @@ namespace Capture {
 			}
 		}
 
-		protected void take_screencapture() {
-			sequence = new Sequence();
+		protected void take_screencapture(ScreenGrabMode mode) {
 
-			var region_select = new RegionSelect();
-			selection = region_select.run();
-			region_select.destroy();
+			ScreenGrabber grabber;
+
+			sequence = new Sequence();
+			sequence.framerate = prefs.framerate.clamp(1, 30);
+
+			switch (mode) {
+				case ScreenGrabMode.REGION:
+					var region_select = new RegionSelect();
+					selection = region_select.run();
+					region_select.destroy();
+					grabber = new ScreenGrabber(ScreenGrabMode.REGION);
+					break;
+				default:
+					grabber = new ScreenGrabber(mode);
+					break;
+			}
 
 			int nframes = 100;
-			var grabber = new ScreenGrabber(ScreenGrabMode.REGION);
-			Timeout.add(50, () => {
-				Logger.notification("Taking a screenshot frame");
+
+			Timeout.add(1000 / prefs.framerate, () => {
 				sequence.add(grabber.grab(selection));
 				if (--nframes <= 0) {
 					/* region_select.destroy(); */
