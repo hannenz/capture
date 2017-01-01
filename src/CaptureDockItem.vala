@@ -204,6 +204,7 @@ namespace Capture {
 
 			var region_select = new RegionSelect();
 			selection = region_select.run();
+			region_select.destroy();
 
 			int nframes = 100;
 			var grabber = new ScreenGrabber(ScreenGrabMode.REGION);
@@ -211,30 +212,16 @@ namespace Capture {
 				Logger.notification("Taking a screenshot frame");
 				sequence.add(grabber.grab(selection));
 				if (--nframes <= 0) {
-					region_select.destroy();
-					capture_preview();
+					/* region_select.destroy(); */
+					var preview = new CapturePreview(sequence);
+					preview.run();
+					preview.destroy();
 					return false;
 				}
 				return true;
 			}, Priority.DEFAULT);
 		}
 
-		protected void capture_preview() {
-			var dlg = new Gtk.Dialog.with_buttons("Preview", null, Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT | Gtk.DialogFlags.USE_HEADER_BAR, "Close", ResponseType.CLOSE);
-
-			var image = new Gtk.Image();
-			var content_area = dlg.get_content_area();
-			content_area.pack_start(image);
-
-			dlg.show_all();
-			Timeout.add(50, () => {
-				image.pixbuf = sequence.next();
-				return true;
-			});
-
-			dlg.run();
-			dlg.destroy();
-		}
 
 		protected override AnimationType on_scrolled(Gdk.ScrollDirection dir, Gdk.ModifierType mod, uint32 event_time) {
 			return AnimationType.NONE;

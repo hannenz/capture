@@ -34,8 +34,23 @@ namespace Capture {
 
 			default_display = Display.get_default();
 			default_screen = default_display.get_default_screen();
-			// FIXME!!!! Use real cursor!
+
+			// FIXME!!!! Use real cursor! 
+			// Seems to be a problem since all known Screenshot tools can't do it (get Gdk WindowTree of another application seems not to be possible
 			var crsr = new Gdk.Cursor.for_display(default_display, Gdk.CursorType.LEFT_PTR);
+			
+			/* for (Gdk.Window win = default_display.get_window_at_pointer(null, null); win != null; win = win.get_parent()) { */
+			/* 	Logger.notification("Retrieving parent window"); */
+			/* 	crsr = win.get_cursor();  */
+			/* 	if (crsr != null) { */
+			/* 		break; */
+			/* 	} */
+			/* } */
+
+			if (crsr == null) {
+				Logger.notification("The cursor is NULL");
+			}
+
 			cursor_pixbuf = crsr.get_image();
 			if (cursor_pixbuf == null) {
 				Logger.notification("*** OH NOES! cursor_pixbuf is NULL! ***");
@@ -59,11 +74,9 @@ namespace Capture {
 						window = Gdk.get_default_root_window();
 						pixbuf = Gdk.pixbuf_get_from_window(window, selection.x, selection.y, selection.width, selection.height);
 
-						Logger.notification("Adding cursor");
 						Gdk.get_default_root_window().get_device_position(Display.get_default().get_device_manager().get_client_pointer(), out cursor_x, out cursor_y, null);
 						int dx = cursor_x - selection.x;
 						int dy = cursor_y - selection.y;
-						Logger.notification("dx = %u, dy = %u".printf(dx, dy));
 						cursor_pixbuf.composite(pixbuf, 0, 0, pixbuf.get_width(), pixbuf.get_height(), dx - 6, dy - 6, 1.0, 1.0, InterpType.BILINEAR, 255);
 					}
 

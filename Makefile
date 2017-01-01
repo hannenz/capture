@@ -13,7 +13,8 @@ SOURCES = src/CaptureDocklet.vala\
 		src/ScreenGrabber.vala\
 		src/RegionSelect.vala\
 		src/Countdown.vala\
-		src/Sequence.vala
+		src/Sequence.vala\
+		src/CapturePreview.vala
 
 UIFILES =
 

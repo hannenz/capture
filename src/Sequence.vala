@@ -23,7 +23,7 @@ namespace Capture {
 
 		public Pixbuf? next() {
 			var pixbuf = pixbufs.nth_data(frame);
-			if (++frame > length()) {
+			if (++frame >= length()) {
 				frame = 0;
 			}
 			return pixbuf;
