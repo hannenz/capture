@@ -220,7 +220,7 @@ namespace Capture {
 		}
 
 		protected void capture_preview() {
-			var dlg = new Gtk.Dialog();
+			var dlg = new Gtk.Dialog.with_buttons("Preview", null, Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT | Gtk.DialogFlags.USE_HEADER_BAR, "Close", ResponseType.CLOSE);
 
 			var image = new Gtk.Image();
 			var content_area = dlg.get_content_area();
