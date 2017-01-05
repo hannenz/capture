@@ -2,6 +2,7 @@ using Granite;
 using Plank;
 using Cairo;
 using Gdk;
+using Gtk;
 
 namespace Capture {
 
@@ -18,6 +19,12 @@ namespace Capture {
 		MOVE
 	}
 
+	public enum SelectionMode {
+		SELECTION,
+		FULL_SCREEN,
+		FULL_DISPLAY
+	}
+
 	public class RegionSelect : Granite.Widgets.CompositedWindow {
 
 		protected Gtk.DrawingArea drawing_area;
@@ -25,16 +32,21 @@ namespace Capture {
 		protected Gdk.Window gwin;
 
 		private DragStatus status;
+		private SelectionMode mode;
 		private int delta_x;
 		private int delta_y;
 
 		public Gdk.Rectangle selection;
+		private Gdk.Rectangle _selection;
 
-		public signal void selected(Gdk.Rectangle? selection);
+		private bool aborted = false;
 
-		construct {
-			resizable = true;
-		}
+
+		/* construct { */
+		/* 	resizable = false; */
+		/* } */
+		
+
 
 		/**
 		  * Constructor
@@ -47,6 +59,8 @@ namespace Capture {
 			selection.y = 100;
 			selection.width = 200;
 			selection.height = 200;
+
+			mode = SelectionMode.SELECTION;
 			
 			drawing_area = new Gtk.DrawingArea();
 			drawing_area.draw.connect(on_draw);
@@ -55,11 +69,11 @@ namespace Capture {
 
 			fullscreen();
 			set_modal(true);
+			set_decorated(false);
 
 			var display = Display.get_default();
 			var manager = display.get_device_manager();
 			mouse = manager.get_client_pointer();
-
 
 			Gdk.Cursor[] cursors = {
 				new Gdk.Cursor.from_name(display, "default"),
@@ -73,7 +87,6 @@ namespace Capture {
 				new Gdk.Cursor.from_name(display, "w-resize"),
 				new Gdk.Cursor.from_name(display, "move")
 			};
-
 
 			drawing_area.button_press_event.connect( (context) => {
 				int x, y;
@@ -235,19 +248,20 @@ namespace Capture {
 					case Gdk.Key.Left:
 						break;
 					case Gdk.Key.Return:
-						selected(selection);
 						Gtk.main_quit();
 						break;
 					case Gdk.Key.space:
-						selected(selection);
 						Gtk.main_quit();
 						break;
 					case Gdk.Key.Escape:
-						selected(null);
+						aborted = true;
 						Gtk.main_quit();
 						break;
+					case Gdk.Key.Tab:
+						toggle_mode();
+						break;
 					default:
-						selected(null);
+						aborted = true;
 						Gtk.main_quit();
 						break;
 				}
@@ -256,13 +270,25 @@ namespace Capture {
 
 			show_all();
 			gwin = this.get_toplevel().get_window();
+			var rootwin = Gdk.get_default_root_window();
+			Logger.notification("%ux%u".printf(rootwin.get_width(), rootwin.get_height()));
+			this.set_default_size(rootwin.get_width(), rootwin.get_height());
+			this.set_size_request(rootwin.get_width(), rootwin.get_height());
+			this.set_resizable(false);
+			this.move(0, 0);
 		}
 
-		public Gdk.Rectangle? run() {
+		/* public Gdk.Rectangle? run() { */
+		public ResponseType run() {
 			show_all();
 			present();
 			Gtk.main();
 			/* destroy(); */
+			return !aborted ? ResponseType.ACCEPT : ResponseType.CANCEL;
+		}
+
+
+		public Gdk.Rectangle get_selection() {
 			return selection;
 		}
 
@@ -283,7 +309,7 @@ namespace Capture {
 
 			int width, height;
 			get_size(out width, out height);
-			ctx.set_source_rgba(0.1, 0.1, 0.1, 0.5);
+			ctx.set_source_rgba(0.1, 0.1, 0.1, 0.8);
 			ctx.rectangle(0, 0, width, selection.y);
 			ctx.fill();
 			ctx.rectangle(0, selection.y + selection.height, width, height - selection.height - selection.y);
@@ -294,6 +320,45 @@ namespace Capture {
 			ctx.fill();
 
 			return true;
+		}
+
+
+		private void toggle_mode() {
+
+			Logger.notification("Toggling mode");
+
+			switch (mode) {
+				case SelectionMode.SELECTION:
+					mode = SelectionMode.FULL_SCREEN;
+					_selection.x = selection.x;
+					_selection.y = selection.y;
+					_selection.width = selection.width;
+					_selection.height = selection.height;
+					selection.x = 0;
+					selection.y = 0;
+					selection.width = gwin.get_width();
+					selection.height = gwin.get_height();
+					break;
+
+				case SelectionMode.FULL_SCREEN:
+					mode = SelectionMode.FULL_DISPLAY;
+					break;
+
+				case SelectionMode.FULL_DISPLAY:
+					mode = SelectionMode.SELECTION;
+					selection.x = _selection.x;
+					selection.y = _selection.y;
+					selection.width = _selection.width;
+					selection.height = _selection.height;
+					break;
+			}
+
+			debug_selection();
+			drawing_area.queue_draw();
+		}
+
+		private void debug_selection() {
+			Logger.notification("Selection: %u|%u, %ux%u".printf(selection.x, selection.y, selection.width, selection.height));
 		}
 	}
 }

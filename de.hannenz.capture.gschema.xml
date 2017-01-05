@@ -1,0 +1,59 @@
+<schemalist>
+	<schema id="de.hannenz.capture" path="/de/hannenz/capture/" gettext-domain="capture">
+		<key name="countdown" type="i">
+			<default>3</default>
+			<summary>Countdown</summary>
+			<description>Countdown time in seconds</description>
+		</key>
+		<key name="framerate" type="i">
+			<range min="1" max="30" />
+			<default>10</default>
+			<summary>Framerate</summary>
+			<description>The framerate for screen captures (frames per second)</description>
+		</key>
+		<key name="file-format" type="s">
+			<choices>
+				<choice value="png" />
+				<choice value="jpg" />
+				<choice value="gif" />
+			</choices>
+
+			<default>"png"</default>
+
+			<summary>Output file format</summary>
+			<description>The image format used for saving screenshots. Screen Captures will always be stored as animated GIF</description>
+		</key>
+
+		<key name="show-notifications" type="b">
+			<default>true</default>
+			<summary>Show notifications</summary>
+			<description>Whether to show desktop notifications or not</description>
+		</key>
+		
+		<key name="copy-to-clipboard" type="b">
+			<default>true</default>
+			<summary>Copy to Clipboard</summary>
+			<description>Whether to copy screenshots to the clipboard</description>
+		</key>
+
+		<key name="auto-save" type="b">
+			<default>true</default>
+			<summary>Auto save</summary>
+			<description>Whether to save output files automatically</description>
+		</key>
+
+		<key name="include-pointer" type="b">
+			<default>true</default>
+			<summary>Include mouse pointer</summary>
+			<description>Whether to include the mouse pointer</description>
+		</key>
+
+		<key name="destination" type="s">
+			<default>"/tmp"</default>
+			<summary>Destination for auto-save</summary>
+			<description>Destination for auto-save</description>
+		</key>
+
+	</schema>
+</schemalist>
+

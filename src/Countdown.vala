@@ -13,11 +13,18 @@ namespace Capture {
 		}
 
 		public void start() {
+
 			timer = seconds;
+
+			if (timer == 0) {
+				ignition();
+				return;
+			}
+
 			Timeout.add_seconds(1, () => {
 				timer--;
 				tick(timer, (double)(seconds - timer) / (double)seconds);
-				if (timer == 0) {
+				if (timer <= 0) {
 					ignition();
 					return false;
 				}

@@ -7,12 +7,13 @@ namespace Capture {
 
 	public class CaptureDockItem : DockletItem {
 
-		private unowned CapturePreferences prefs;
+		/* private unowned CapturePreferences prefs; */
 		private ScreenGrabMode mode;
 		private Gtk.Clipboard clipboard;
 		private Gdk.Rectangle? selection;
 		private Sequence sequence;
-
+		private GLib.Settings settings;
+		private bool capturing = false;
 
 		public CaptureDockItem.with_dockitem_file(GLib.File file) {
 			GLib.Object(Prefs: new CapturePreferences.with_file(file));
@@ -22,9 +23,10 @@ namespace Capture {
 			Logger.initialize("capture");
 			Logger.DisplayLevel = LogLevel.NOTIFY;
 
-			prefs = (CapturePreferences) Prefs;
+			/* prefs = (CapturePreferences) Prefs; */
 
-			Icon = "media-record";
+			/* Icon = "media-record"; */
+			Icon = "camera-video";
 			Text = "Capture something";
 
 			Notify.init("Capture Docklet");
@@ -34,7 +36,11 @@ namespace Capture {
 			mode = ScreenGrabMode.DESKTOP;
 			selection = null;
 
-			/* sequence = new Sequence(); */
+			settings = new GLib.Settings("de.hannenz.capture");
+
+			Logger.notification("GTK Version is %u.%u".printf(Gtk.get_major_version(), Gtk.get_minor_version()));
+			Logger.notification("screens:  %u".printf(Display.get_default().get_n_screens()));
+			Logger.notification("monitors: %u".printf(Display.get_default().get_screen(0).get_n_monitors()));
 		}
 
 		public override Gee.ArrayList<Gtk.MenuItem> get_menu_items() {
@@ -93,16 +99,26 @@ namespace Capture {
 
 			if (this.mode == ScreenGrabMode.REGION) {
 				region_select = new RegionSelect();
-				selection = region_select.run();
+				var response = region_select.run();
+
+				region_select.destroy();
+
+				if (response == ResponseType.CANCEL) {
+					return;
+				}
+
+				selection = region_select.get_selection();
 			}
 
 			ProgressVisible = true;
 			CountVisible = true;
-			Count = prefs.countdown;
 			Progress = 0;
+
+			var c = settings.get_int("countdown");
 			
-			Logger.notification("prefs.countdown = %u".printf(prefs.countdown));
-			var countdown = new Countdown(prefs.countdown);
+			var countdown = new Countdown(c);
+			Logger.notification("countdown = %u".printf(c));
+			Count = c;
 
 			countdown.tick.connect( (second, progress) => {
 				Count = second;
@@ -110,9 +126,9 @@ namespace Capture {
 			});
 
 			countdown.ignition.connect( () => {
-				if (this.mode == ScreenGrabMode.REGION) {
-					region_select.destroy();
-				}
+				/* if (this.mode == ScreenGrabMode.REGION) { */
+				/* 	region_select.destroy(); */
+				/* } */
 				shot();
 				ProgressVisible = false;
 				CountVisible = false;
@@ -151,11 +167,12 @@ namespace Capture {
 			string name = "%s%s.%s".printf("capture-", now.to_string(), "png");
 			string filename = null;
 
-			if (prefs.auto_save) {
+			if (settings.get_boolean("auto-save")) {
 
 				filename = Path.build_path(
 					Path.DIR_SEPARATOR_S, 
-					prefs.destination,
+					/* prefs.destination, */
+					settings.get_string("destination"),
 					name
 				);
 			}
@@ -175,7 +192,7 @@ namespace Capture {
 					pixbuf.save(filename, "png");
 
 
-					if (prefs.show_notifications) {
+					if (settings.get_boolean("show-notifications")) {
 						var notification = new Notify.Notification("Screenshot has been saved", filename, "dialog-information");
 						notification.set_image_from_pixbuf(pixbuf);
 						/* notification.add_action("action-name", "Open", (notification, action) => { */
@@ -203,7 +220,7 @@ namespace Capture {
 				}
 			}
 
-			if (prefs.copy_to_clipboard) {
+			if (settings.get_boolean("copy-to-clipboard")) {
 				clipboard.set_image(pixbuf);
 			}
 		}
@@ -213,13 +230,17 @@ namespace Capture {
 			ScreenGrabber grabber;
 
 			sequence = new Sequence();
-			sequence.framerate = prefs.framerate.clamp(1, 30);
+			sequence.framerate = settings.get_int("framerate").clamp(1, 30);
 
 			switch (mode) {
 				case ScreenGrabMode.REGION:
 					var region_select = new RegionSelect();
-					selection = region_select.run();
+					var response = region_select.run();
 					region_select.destroy();
+					if (response == ResponseType.CANCEL) {
+						return;
+					}
+					selection = region_select.get_selection();
 					grabber = new ScreenGrabber(ScreenGrabMode.REGION);
 					break;
 				default:
@@ -227,15 +248,35 @@ namespace Capture {
 					break;
 			}
 
-			int nframes = 100;
+			int nframes = 30;
+			int framerate = settings.get_int("framerate");
+			Logger.notification("Framerate is %d".printf(framerate));
+			capturing = true;
+			double duration = 0;
+			CountVisible = true;
 
-			Timeout.add(1000 / prefs.framerate, () => {
+			Timeout.add(1000 / framerate, () => {
+				duration += (1.0 / (double)framerate);
+				Count = (int)duration; 
+				Logger.notification("Shooting a frame...%.3f".printf(duration));
 				sequence.add(grabber.grab(selection));
-				if (--nframes <= 0) {
-					/* region_select.destroy(); */
+
+				if (capturing == false) {
 					var preview = new CapturePreview(sequence);
-					preview.run();
+					var response = preview.run();
 					preview.destroy();
+					if (response == ResponseType.ACCEPT) {
+						var file_chooser = new FileChooserDialog("Save", null, FileChooserAction.SAVE, "Cancel", ResponseType.CANCEL, "Save", ResponseType.ACCEPT);
+						response = file_chooser.run();
+						var filename = file_chooser.get_filename();
+
+						file_chooser.destroy();
+
+						if(response == ResponseType.ACCEPT) {
+							sequence.save_to_animated_gif(filename);
+						}
+					}
+					CountVisible = false;
 					return false;
 				}
 				return true;
@@ -249,7 +290,12 @@ namespace Capture {
 
 		protected override AnimationType on_clicked(PopupButton button, Gdk.ModifierType mod, uint32 event_time) {
 			if (button == PopupButton.LEFT) {
-				take_screenshot(null);
+				if (!capturing) {
+					take_screenshot(null);
+				}
+				else {
+					capturing = false;
+				}
 				return AnimationType.BOUNCE;
 			}
 			return AnimationType.NONE;

@@ -5,7 +5,7 @@ PKGCONFIG = $(shell which pkg-config)
 PACKAGES = gtk+-3.0 plank granite libnotify
 CFLAGS = `$(PKGCONFIG) --cflags $(PACKAGES)`
 LIBS = `$(PKGCONFIG) --libs $(PACKAGES)`
-VALAFLAGS = $(patsubst %, --pkg %, $(PACKAGES)) -X -fPIC -X -shared --library=$(PRG)
+VALAFLAGS = $(patsubst %, --pkg %, $(PACKAGES)) -X -fPIC -X -shared -X -w --library=$(PRG) --disable-warnings
 
 SOURCES = src/CaptureDocklet.vala\
 		src/CaptureDockItem.vala\
@@ -25,19 +25,18 @@ UIFILES =
 
 all: $(PRG)
 $(PRG): $(SOURCES) $(UIFILES)
-	glib-compile-resources capture.gresource.xml --target=resources.c --generate-source
-	$(VALAC) -o $(PRG) $(SOURCES) resources.c $(VALAFLAGS)
+	@glib-compile-resources capture.gresource.xml --target=resources.c --generate-source
+	@$(VALAC) -o $(PRG) $(SOURCES) resources.c $(VALAFLAGS)
 
 install:
 	cp $(PRG) /usr/lib/x86_64-linux-gnu/plank/docklets/
-	# killall plank
 
-
+schema: de.hannenz.capture.gschema.xml
+	cp de.hannenz.capture.gschema.xml /usr/share/glib-2.0/schemas/ && glib-compile-schemas /usr/share/glib-2.0/schemas/
 
 clean:
-	# rm -f $(OBJS)
 	rm -f $(PRG)
 
 distclean: clean
-	rm -f *.vala.c
+	rm -f src/*.vala.c
 
