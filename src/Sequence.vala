@@ -121,7 +121,8 @@ namespace Capture {
 			try {
 				MainLoop loop = new MainLoop();
 
-				string args[] = {"/usr/bin/convert", "-delay", "10", "-loop", "0", "*", filename, null};
+				string delay = (100 / framerate).to_string();
+				string args[] = {"/usr/bin/convert", "-delay", delay, "-loop", "0", "*", filename, null};
 				/* string env  = null;// Environ.get(); */
 				Pid child_pid;
 				Process.spawn_async(
