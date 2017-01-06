@@ -16,7 +16,7 @@ namespace Capture {
 		private bool capturing = false;
 
 		public CaptureDockItem.with_dockitem_file(GLib.File file) {
-			GLib.Object(Prefs: new CapturePreferences.with_file(file));
+			/* GLib.Object(Prefs: new CapturePreferences.with_file(file)); */
 		}
 
 		construct {
@@ -83,6 +83,9 @@ namespace Capture {
 			item = create_menu_item("Settings", "", true);
 			item.activate.connect( () => {
 				Logger.notification("Settings");
+				var dlg = new SettingsDialog();
+				dlg.run();
+				dlg.destroy();
 			});
 			items.add(item);
 
@@ -248,7 +251,6 @@ namespace Capture {
 					break;
 			}
 
-			int nframes = 30;
 			int framerate = settings.get_int("framerate");
 			Logger.notification("Framerate is %d".printf(framerate));
 			capturing = true;

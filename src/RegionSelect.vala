@@ -70,6 +70,8 @@ namespace Capture {
 			fullscreen();
 			set_modal(true);
 			set_decorated(false);
+			set_skip_pager_hint(true);
+			set_skip_taskbar_hint(true);
 
 			var display = Display.get_default();
 			var manager = display.get_device_manager();

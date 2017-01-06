@@ -14,7 +14,8 @@ SOURCES = src/CaptureDocklet.vala\
 		src/RegionSelect.vala\
 		src/Countdown.vala\
 		src/Sequence.vala\
-		src/CapturePreview.vala
+		src/CapturePreview.vala\
+		src/SettingsDialog.vala
 
 UIFILES =
 
