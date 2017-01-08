@@ -13,7 +13,6 @@ namespace Capture {
 
 		private Display default_display;
 		private Screen default_screen; 
-		/* private Window window; */
 		private Pixbuf cursor_pixbuf;
 		private int cursor_x;
 		private int cursor_y;
@@ -26,12 +25,15 @@ namespace Capture {
 		public signal void grabbed(Pixbuf? pixbuf);
 
 
-		public ScreenGrabber(ScreenGrabMode mode) {
+		public ScreenGrabber(ScreenGrabMode mode, bool include_cursor) {
 			
 			this.mode = mode;
-			include_cursor = true;
+			this.include_cursor = include_cursor;
+
+			Logger.notification("include_cursor=%s".printf(include_cursor.to_string()));
 
 		}
+
 
 		public Pixbuf grab(Gdk.Rectangle? selection) {
 
@@ -118,20 +120,17 @@ namespace Capture {
 			return pixbuf;
 		}
 
-		public ScreenGrabber.from_region () {
-			this(ScreenGrabMode.REGION);
+		public ScreenGrabber.from_region (bool include_cursor) {
+			this(ScreenGrabMode.REGION, include_cursor);
 		}
 
-		public ScreenGrabber.from_window() {
-			this(ScreenGrabMode.WINDOW);
+		public ScreenGrabber.from_window(bool include_cursor) {
+			this(ScreenGrabMode.WINDOW, include_cursor);
 		}
 
-		public ScreenGrabber.from_desktop() {
-			this(ScreenGrabMode.DESKTOP);
+		public ScreenGrabber.from_desktop(bool include_cursor) {
+			this(ScreenGrabMode.DESKTOP, include_cursor);
 		}
 
-
-		/* public void take_screencapture() { */
-		/* } */
 	}
 }

@@ -40,12 +40,9 @@ namespace Capture {
 		private Gdk.Rectangle _selection;
 
 		private bool aborted = false;
+		private GLib.Settings settings;
 
 
-		/* construct { */
-		/* 	resizable = false; */
-		/* } */
-		
 
 
 		/**
@@ -55,10 +52,9 @@ namespace Capture {
 
 			// TODO: Place default selection in center of screen
 			selection = Gdk.Rectangle();
-			selection.x = 100;
-			selection.y = 100;
-			selection.width = 200;
-			selection.height = 200;
+
+			settings = new GLib.Settings("de.hannenz.capture");
+			settings.get_string("selection").scanf("%d %d %d %d", &selection.x, &selection.y, &selection.width, &selection.height);
 
 			mode = SelectionMode.SELECTION;
 			
@@ -74,11 +70,11 @@ namespace Capture {
 			set_skip_taskbar_hint(true);
 
 			var display = Display.get_default();
-			var manager = display.get_device_manager();
-			mouse = manager.get_client_pointer();
+
+			mouse = display.get_device_manager().get_client_pointer();
 
 			Gdk.Cursor[] cursors = {
-				new Gdk.Cursor.from_name(display, "default"),
+				new Gdk.Cursor.from_name(display, "crosshair"),
 				new Gdk.Cursor.from_name(display, "nw-resize"),
 				new Gdk.Cursor.from_name(display, "ne-resize"),
 				new Gdk.Cursor.from_name(display, "se-resize"),
@@ -89,6 +85,8 @@ namespace Capture {
 				new Gdk.Cursor.from_name(display, "w-resize"),
 				new Gdk.Cursor.from_name(display, "move")
 			};
+
+			gwin.set_cursor(cursors[DragStatus.NONE]);
 
 			drawing_area.button_press_event.connect( (context) => {
 				int x, y;
@@ -143,6 +141,9 @@ namespace Capture {
 				int x, y;
 				/* Gdk.get_default_root_window().get_device_position(mouse, out x, out y, null); */
 				gwin.get_device_position(mouse, out x, out y, null);
+
+
+
 				if ( is_near(x, y, selection.x, selection.y, 30)) {
 					gwin.set_cursor(cursors[DragStatus.NORTHWEST]);
 				}
@@ -196,8 +197,8 @@ namespace Capture {
 						selection.x = x;
 						break;
 					case DragStatus.MOVE:
-						selection.x = x - delta_x;
-						selection.y = y - delta_y;
+						selection.x = (x - delta_x).clamp(0, gwin.get_width() - selection.width);
+						selection.y = (y - delta_y).clamp(0, gwin.get_height() - selection.height);
 						break;
 					case DragStatus.NORTH:
 						selection.height += selection.y - y;
@@ -233,6 +234,7 @@ namespace Capture {
 					selection.y -= selection.height;
 				}
 
+				settings.set_string("selection", "%d %d %d %d".printf(selection.x, selection.y, selection.width, selection.height));
 				status = DragStatus.NONE;
 				return true;
 			});
@@ -251,9 +253,11 @@ namespace Capture {
 						break;
 					case Gdk.Key.Return:
 						Gtk.main_quit();
+						settings.set_string("selection", "%d %d %d %d".printf(selection.x, selection.y, selection.width, selection.height));
 						break;
 					case Gdk.Key.space:
 						Gtk.main_quit();
+						settings.set_string("selection", "%d %d %d %d".printf(selection.x, selection.y, selection.width, selection.height));
 						break;
 					case Gdk.Key.Escape:
 						aborted = true;
@@ -280,12 +284,11 @@ namespace Capture {
 			this.move(0, 0);
 		}
 
-		/* public Gdk.Rectangle? run() { */
+		
 		public ResponseType run() {
 			show_all();
 			present();
 			Gtk.main();
-			/* destroy(); */
 			return !aborted ? ResponseType.ACCEPT : ResponseType.CANCEL;
 		}
 
@@ -307,7 +310,7 @@ namespace Capture {
 		}
 
 
-		protected bool on_draw(Context ctx) {
+		protected bool on_draw(Cairo.Context ctx) {
 
 			int width, height;
 			get_size(out width, out height);

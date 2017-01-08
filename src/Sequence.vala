@@ -87,6 +87,9 @@ namespace Capture {
 			var vbox = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
 			var progress_bar = new Gtk.ProgressBar();
 			vbox.pack_start(progress_bar, true, false, 0);
+			var cancel_button = new Gtk.Button.with_label(("Cancel"));
+			cancel_button.set_sensitive(false);
+			vbox.pack_start(cancel_button);
 			win.add(vbox);
 			win.show_all();
 			win.present();
@@ -135,6 +138,10 @@ namespace Capture {
 				);
 
 				Logger.notification("Spawned process with PID: %u".printf(child_pid));
+				cancel_button.set_sensitive(true);
+				cancel_button.clicked.connect( () => {
+					Posix.kill(child_pid, ProcessSignal.TERM);
+				});
 
 				ChildWatch.add(child_pid, (pid, status) => {
 					Logger.notification("Child exited with status: %u".printf(status));

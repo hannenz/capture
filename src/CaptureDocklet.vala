@@ -21,7 +21,7 @@ namespace Capture {
 		}
 
 		public unowned string get_icon() {
-			return "camera-video"; //"media-record";
+			return "camera-video"; 
 		}
 
 		public bool is_supported() {

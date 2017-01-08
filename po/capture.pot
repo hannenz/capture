@@ -1,0 +1,103 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-07 22:14+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/SettingsDialog.vala:68
+msgid "Auto save"
+msgstr ""
+
+#: src/CaptureDockItem.vala:44
+msgid "Capture something"
+msgstr ""
+
+#: src/SettingsDialog.vala:50
+msgid "Close"
+msgstr ""
+
+#: src/SettingsDialog.vala:76
+msgid "Copy to clipboard"
+msgstr ""
+
+#: src/SettingsDialog.vala:54
+msgid "Countdown"
+msgstr ""
+
+#: src/SettingsDialog.vala:80 src/SettingsDialog.vala:81
+msgid "Destination"
+msgstr ""
+
+#: src/SettingsDialog.vala:88
+msgid "File format"
+msgstr ""
+
+#: src/SettingsDialog.vala:59
+msgid "Framerate"
+msgstr ""
+
+#: src/CaptureDockItem.vala:66
+#, c-format
+msgid "GTK Version is %u.%u"
+msgstr ""
+
+#: src/SettingsDialog.vala:64
+msgid "Include pointer"
+msgstr ""
+
+#: src/CaptureDockItem.vala:68
+#, c-format
+msgid "Monitors: %u"
+msgstr ""
+
+#: src/CaptureDockItem.vala:95
+msgid "Screencast"
+msgstr ""
+
+#: src/CaptureDockItem.vala:67
+#, c-format
+msgid "Screens:  %u"
+msgstr ""
+
+#: src/CaptureDockItem.vala:90
+msgid "Screenshot"
+msgstr ""
+
+#: src/CaptureDockItem.vala:236
+msgid "Select destination to save the capture"
+msgstr ""
+
+#: src/CaptureDockItem.vala:136 src/CaptureDockItem.vala:138
+#: src/SettingsDialog.vala:34
+msgid "Settings"
+msgstr ""
+
+#: src/SettingsDialog.vala:72
+msgid "Show notifications"
+msgstr ""
+
+#: src/CaptureDockItem.vala:63
+msgid "Starting up Capture Docklet"
+msgstr ""
+
+#: src/CaptureDockItem.vala:223
+#, c-format
+msgid "screenshot-"
+msgstr ""
+
+#: src/CaptureDockItem.vala:65
+msgid "some strting"
+msgstr ""

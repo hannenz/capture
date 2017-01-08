@@ -1,0 +1,107 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-07 22:14+0100\n"
+"PO-Revision-Date: 2017-01-07 22:14+0100\n"
+"Last-Translator: Johannes Braun <me@hannenz.de>\n"
+"Language-Team: \n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7.1\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/SettingsDialog.vala:68
+msgid "Auto save"
+msgstr "Automatisch speichern"
+
+#: src/CaptureDockItem.vala:44
+msgid "Capture something"
+msgstr ""
+
+#: src/SettingsDialog.vala:50
+msgid "Close"
+msgstr "Schliessen"
+
+#: src/SettingsDialog.vala:76
+msgid "Copy to clipboard"
+msgstr "In Zwischenablage kopieren"
+
+#: src/SettingsDialog.vala:54
+msgid "Countdown"
+msgstr "Verzögerung"
+
+#: src/SettingsDialog.vala:80 src/SettingsDialog.vala:81
+msgid "Destination"
+msgstr "Speicherort"
+
+#: src/SettingsDialog.vala:88
+msgid "File format"
+msgstr "Dateiformat"
+
+#: src/SettingsDialog.vala:59
+msgid "Framerate"
+msgstr "Bildwiederholrate"
+
+#: src/CaptureDockItem.vala:66
+#, c-format
+msgid "GTK Version is %u.%u"
+msgstr ""
+
+#: src/SettingsDialog.vala:64
+msgid "Include pointer"
+msgstr "Mauszeiger einbeziehen"
+
+#: src/CaptureDockItem.vala:68
+#, c-format
+msgid "Monitors: %u"
+msgstr ""
+
+#: src/CaptureDockItem.vala:95
+msgid "Screencast"
+msgstr "Bildschirmaufnahme"
+
+#: src/CaptureDockItem.vala:67
+#, c-format
+msgid "Screens:  %u"
+msgstr ""
+
+#: src/CaptureDockItem.vala:90
+msgid "Screenshot"
+msgstr "Bildschirmfoto"
+
+#: src/CaptureDockItem.vala:236
+msgid "Select destination to save the capture"
+msgstr ""
+
+#: src/CaptureDockItem.vala:136 src/CaptureDockItem.vala:138
+#: src/SettingsDialog.vala:34
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: src/SettingsDialog.vala:72
+msgid "Show notifications"
+msgstr "Benachrichtigungen anzeigen"
+
+#: src/CaptureDockItem.vala:63
+msgid "Starting up Capture Docklet"
+msgstr ""
+
+#: src/CaptureDockItem.vala:223
+#, c-format
+msgid "screenshot-"
+msgstr "Bildschirmfoto-"
+
+#: src/CaptureDockItem.vala:65
+msgid "some strting"
+msgstr ""
+
+#~ msgid "Bananabread"
+#~ msgstr "Bananenbrot"
