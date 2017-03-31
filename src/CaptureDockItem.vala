@@ -32,8 +32,11 @@ namespace Capture {
 			Intl.bind_textdomain_codeset(GETTEXT_PACKAGE, "utf-8");
 			Intl.bindtextdomain(GETTEXT_PACKAGE, "./po");
 
+			/* Intl.bindtextdomain( */
+
 			Logger.initialize("capture");
 			Logger.DisplayLevel = LogLevel.NOTIFY;
+			Logger.notification(_("This is the Capture Docklet"));
 
 
 			Icon = "camera-video";

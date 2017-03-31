@@ -1,0 +1,10 @@
+src/CaptureDockItem.vala
+src/CaptureDocklet.vala
+src/CapturePreferences.vala
+src/CapturePreview.vala
+src/Countdown.vala
+src/RegionSelect.vala
+src/ScreenGrabber.vala
+src/Sequence.vala
+src/SettingsDialog.vala
+src/capture.vala

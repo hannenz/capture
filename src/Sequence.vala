@@ -1,5 +1,6 @@
 using Gdk;
 using Plank;
+using Posix;
 
 namespace Capture {
 
@@ -32,7 +33,7 @@ namespace Capture {
 
 		public Pixbuf? first() {
 
-			assert (pixbufs.length() > 0);
+			GLib.assert (pixbufs.length() > 0);
 
 			return pixbufs.nth_data(0);
 		}
@@ -41,7 +42,7 @@ namespace Capture {
 			
 		public Pixbuf? next() {
 
-			assert (pixbufs.length() > 0);
+			GLib.assert (pixbufs.length() > 0);
 
 			if (++frame >= length()) {
 				frame = 0;
@@ -53,7 +54,7 @@ namespace Capture {
 
 		public Pixbuf? previous() {
 
-			assert (pixbufs.length() > 0);
+			GLib.assert (pixbufs.length() > 0);
 
 			if (frame == 0) {
 				frame = pixbufs.length() - 1;
@@ -124,8 +125,10 @@ namespace Capture {
 			try {
 				MainLoop loop = new MainLoop();
 
+				string tmp_filename = GLib.Path.build_filename(dirname, "tmp.gif");
+
 				string delay = (100 / framerate).to_string();
-				string args[] = {"/usr/bin/convert", "-delay", delay, "-loop", "0", "*", filename, null};
+				string args[] = {"/usr/bin/convert", "-delay", delay, "-loop", "0", "*", tmp_filename, null};
 				/* string env  = null;// Environ.get(); */
 				Pid child_pid;
 				Process.spawn_async(
@@ -146,8 +149,21 @@ namespace Capture {
 				ChildWatch.add(child_pid, (pid, status) => {
 					Logger.notification("Child exited with status: %u".printf(status));
 					Process.close_pid(pid);
-					loop.quit();
-					win.destroy();
+
+					// TODO: Handle status;
+					string args2[] = {"/usr/bin/convert", "-layers", "Optimize", tmp_filename, filename, null};
+					Process.spawn_async(dirname, args2, null, SpawnFlags.SEARCH_PATH | SpawnFlags.DO_NOT_REAP_CHILD, null, out child_pid);
+					// Cancel button should still handle the (now new) child_pid??
+
+					ChildWatch.add(child_pid, (pid, status) => {
+						Logger.notification("Child exited with status: %u".printf(status));
+						Process.close_pid(pid);
+
+						// TODO: Handle status;
+
+						loop.quit();
+						win.destroy();
+					});
 				});
 
 				Timeout.add(250, () => {

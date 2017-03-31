@@ -1,0 +1,56 @@
+### AutoVala Project ###
+autovala_version: 24
+project_name: docklet-capture
+*vala_version: 0.34
+
+vala_library: src/docklet-capture
+*namespace: Capture
+*vala_package: posix
+*vala_check_package: atk
+*vala_check_package: cairo
+*vala_check_package: gdk-3.0
+*vala_check_package: gdk-pixbuf-2.0
+*vala_check_package: gee-0.8
+*vala_check_package: gio-2.0
+*vala_check_package: gio-unix-2.0
+*vala_check_package: glib-2.0
+*vala_check_package: gobject-2.0
+*vala_check_package: granite
+*vala_check_package: gtk+-3.0
+*vala_check_package: libbamf3
+*vala_check_package: libnotify
+*vala_check_package: pango
+*vala_check_package: pangocairo
+*vala_check_package: plank
+*vala_check_package: x11
+*vala_source: CaptureDockItem.vala
+*vala_source: CaptureDocklet.vala
+*vala_source: CapturePreferences.vala
+*vala_source: CapturePreview.vala
+*vala_source: Countdown.vala
+*vala_source: RegionSelect.vala
+*vala_source: ScreenGrabber.vala
+*vala_source: Sequence.vala
+*vala_source: SettingsDialog.vala
+*vala_source: capture.vala
+
+
+*po: po
+
+*translate: vala src/CaptureDockItem.vala
+*translate: vala src/CaptureDocklet.vala
+*translate: vala src/CapturePreferences.vala
+*translate: vala src/CapturePreview.vala
+*translate: vala src/Countdown.vala
+*translate: vala src/RegionSelect.vala
+*translate: vala src/ScreenGrabber.vala
+*translate: vala src/Sequence.vala
+*translate: vala src/SettingsDialog.vala
+*translate: vala src/capture.vala
+
+*data: data/local
+
+*doc: doc
+
+*scheme: data/de.hannenz.capture.gschema.xml
+

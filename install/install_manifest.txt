@@ -1,0 +1,9 @@
+/usr/lib/x86_64-linux-gnu/plank/docklets/share/glib-2.0/schemas/de.hannenz.capture.gschema.xml
+/usr/lib/x86_64-linux-gnu/plank/docklets/lib/libCapture.so.1.0.0
+/usr/lib/x86_64-linux-gnu/plank/docklets/lib/libCapture.so.1
+/usr/lib/x86_64-linux-gnu/plank/docklets/lib/libCapture.so
+/usr/lib/x86_64-linux-gnu/plank/docklets/include/Capture.h
+/usr/lib/x86_64-linux-gnu/plank/docklets/share/vala/vapi/Capture.vapi
+/usr/lib/x86_64-linux-gnu/plank/docklets/share/vala/vapi/Capture.deps
+/usr/lib/x86_64-linux-gnu/plank/docklets/share/gir-1.0/Capture-1.0.gir
+/usr/lib/x86_64-linux-gnu/plank/docklets/lib/pkgconfig/Capture.pc

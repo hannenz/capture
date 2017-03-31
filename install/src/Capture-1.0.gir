@@ -1,0 +1,621 @@
+<?xml version="1.0"?>
+<repository version="1.2" xmlns="http://www.gtk.org/introspection/core/1.0" xmlns:c="http://www.gtk.org/introspection/c/1.0" xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+<include name="Gio" version="2.0"/>
+<include name="GObject" version="2.0"/>
+<include name="Gtk" version="3.0"/>
+<include name="Gdk" version="3.0"/>
+<include name="cairo" version="1.0"/>
+<include name="GdkPixbuf" version="2.0"/>
+<include name="GLib" version="2.0"/>
+<package name="Capture"/>
+<c:include name="Capture.h"/>
+<namespace name="Capture" version="1.0" c:prefix="CaptureConstants">
+	<constant name="DATADIR" c:identifier="CAPTURE_CONSTANTS_DATADIR" value="/usr/lib/x86_64-linux-gnu/plank/docklets/share">
+		<type name="utf8" c:type="const gchar*"/>
+	</constant>
+	<constant name="PKGDATADIR" c:identifier="CAPTURE_CONSTANTS_PKGDATADIR" value="/usr/lib/x86_64-linux-gnu/plank/docklets/share/docklet-capture">
+		<type name="utf8" c:type="const gchar*"/>
+	</constant>
+	<constant name="GETTEXT_PACKAGE" c:identifier="CAPTURE_CONSTANTS_GETTEXT_PACKAGE" value="docklet-capture">
+		<type name="utf8" c:type="const gchar*"/>
+	</constant>
+	<constant name="RELEASE_NAME" c:identifier="CAPTURE_CONSTANTS_RELEASE_NAME" value="docklet-capture">
+		<type name="utf8" c:type="const gchar*"/>
+	</constant>
+	<constant name="VERSION" c:identifier="CAPTURE_CONSTANTS_VERSION" value="1.0.0">
+		<type name="utf8" c:type="const gchar*"/>
+	</constant>
+</namespace>
+<c:include name="Capture.h"/>
+<namespace name="Capture" version="1.0" c:prefix="Capture">
+	<enumeration name="CaptureMode" c:type="CaptureCaptureMode" glib:type-name="CaptureCaptureMode" glib:get-type="capture_capture_mode_get_type">
+		<member name="screenshot" c:identifier="CAPTURE_CAPTURE_MODE_SCREENSHOT" value="0"/>
+		<member name="screencast" c:identifier="CAPTURE_CAPTURE_MODE_SCREENCAST" value="1"/>
+	</enumeration>
+	<enumeration name="DragStatus" c:type="CaptureDragStatus" glib:type-name="CaptureDragStatus" glib:get-type="capture_drag_status_get_type">
+		<member name="none" c:identifier="CAPTURE_DRAG_STATUS_NONE" value="0"/>
+		<member name="northwest" c:identifier="CAPTURE_DRAG_STATUS_NORTHWEST" value="1"/>
+		<member name="northeast" c:identifier="CAPTURE_DRAG_STATUS_NORTHEAST" value="2"/>
+		<member name="southeast" c:identifier="CAPTURE_DRAG_STATUS_SOUTHEAST" value="3"/>
+		<member name="southwest" c:identifier="CAPTURE_DRAG_STATUS_SOUTHWEST" value="4"/>
+		<member name="north" c:identifier="CAPTURE_DRAG_STATUS_NORTH" value="5"/>
+		<member name="east" c:identifier="CAPTURE_DRAG_STATUS_EAST" value="6"/>
+		<member name="south" c:identifier="CAPTURE_DRAG_STATUS_SOUTH" value="7"/>
+		<member name="west" c:identifier="CAPTURE_DRAG_STATUS_WEST" value="8"/>
+		<member name="move" c:identifier="CAPTURE_DRAG_STATUS_MOVE" value="9"/>
+	</enumeration>
+	<enumeration name="SelectionMode" c:type="CaptureSelectionMode" glib:type-name="CaptureSelectionMode" glib:get-type="capture_selection_mode_get_type">
+		<member name="selection" c:identifier="CAPTURE_SELECTION_MODE_SELECTION" value="0"/>
+		<member name="full_screen" c:identifier="CAPTURE_SELECTION_MODE_FULL_SCREEN" value="1"/>
+		<member name="full_display" c:identifier="CAPTURE_SELECTION_MODE_FULL_DISPLAY" value="2"/>
+	</enumeration>
+	<enumeration name="ScreenGrabMode" c:type="CaptureScreenGrabMode" glib:type-name="CaptureScreenGrabMode" glib:get-type="capture_screen_grab_mode_get_type">
+		<member name="desktop" c:identifier="CAPTURE_SCREEN_GRAB_MODE_DESKTOP" value="0"/>
+		<member name="window" c:identifier="CAPTURE_SCREEN_GRAB_MODE_WINDOW" value="1"/>
+		<member name="region" c:identifier="CAPTURE_SCREEN_GRAB_MODE_REGION" value="2"/>
+	</enumeration>
+	<class name="CaptureDockItem" c:type="CaptureCaptureDockItem" glib:type-name="CaptureCaptureDockItem" glib:get-type="capture_capture_dock_item_get_type" glib:type-struct="CaptureDockItemClass" parent="Plank.DockletItem">
+		<field name="parent_instance">
+			<type name="Plank.DockletItem" c:type="PlankDockletItem"/>
+		</field>
+		<field name="priv">
+			<type name="CaptureDockItemPrivate" c:type="CaptureCaptureDockItemPrivate*"/>
+		</field>
+		<constructor name="with_dockitem_file" c:identifier="capture_capture_dock_item_new_with_dockitem_file">
+			<return-value transfer-ownership="full">
+				<type name="Capture.CaptureDockItem" c:type="CaptureCaptureDockItem*"/>
+			</return-value>
+			<parameters>
+				<parameter name="file" transfer-ownership="none">
+					<type name="Gio.File" c:type="GFile*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<method name="switch_capture_mode" c:identifier="capture_capture_dock_item_switch_capture_mode">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="mode" transfer-ownership="none">
+					<type name="Capture.CaptureMode" c:type="CaptureCaptureMode"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="take_screenshot" c:identifier="capture_capture_dock_item_take_screenshot">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="mode" transfer-ownership="none" allow-none="1">
+					<type name="Capture.ScreenGrabMode" c:type="CaptureScreenGrabMode*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="shot" c:identifier="capture_capture_dock_item_shot">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+		</method>
+		<method name="take_screencapture" c:identifier="capture_capture_dock_item_take_screencapture">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="mode" transfer-ownership="none">
+					<type name="Capture.ScreenGrabMode" c:type="CaptureScreenGrabMode"/>
+				</parameter>
+			</parameters>
+		</method>
+		<constructor name="new" c:identifier="capture_capture_dock_item_new">
+			<return-value transfer-ownership="full">
+				<type name="Capture.CaptureDockItem" c:type="CaptureCaptureDockItem*"/>
+			</return-value>
+		</constructor>
+	</class>
+	<record name="CaptureDockItemClass" c:type="CaptureCaptureDockItemClass" glib:is-gtype-struct-for="CaptureDockItem">
+		<field name="parent_class">
+			<type name="Plank.DockletItemClass" c:type="PlankDockletItemClass"/>
+		</field>
+	</record>
+	<record name="CaptureDockItemPrivate" c:type="CaptureCaptureDockItemPrivate" disguised="1"/>
+	<class name="CaptureDocklet" c:type="CaptureCaptureDocklet" glib:type-name="CaptureCaptureDocklet" glib:get-type="capture_capture_docklet_get_type" glib:type-struct="CaptureDockletClass" parent="GObject.Object">
+		<implements name="Plank.Docklet"/>
+		<field name="parent_instance">
+			<type name="GObject.Object" c:type="GObject"/>
+		</field>
+		<field name="priv">
+			<type name="CaptureDockletPrivate" c:type="CaptureCaptureDockletPrivate*"/>
+		</field>
+		<constructor name="new" c:identifier="capture_capture_docklet_new">
+			<return-value transfer-ownership="full">
+				<type name="Capture.CaptureDocklet" c:type="CaptureCaptureDocklet*"/>
+			</return-value>
+		</constructor>
+	</class>
+	<record name="CaptureDockletClass" c:type="CaptureCaptureDockletClass" glib:is-gtype-struct-for="CaptureDocklet">
+		<field name="parent_class">
+			<type name="GObject.ObjectClass" c:type="GObjectClass"/>
+		</field>
+	</record>
+	<record name="CaptureDockletPrivate" c:type="CaptureCaptureDockletPrivate" disguised="1"/>
+	<class name="CapturePreferences" c:type="CaptureCapturePreferences" glib:type-name="CaptureCapturePreferences" glib:get-type="capture_capture_preferences_get_type" glib:type-struct="CapturePreferencesClass" parent="Plank.DockItemPreferences">
+		<field name="parent_instance">
+			<type name="Plank.DockItemPreferences" c:type="PlankDockItemPreferences"/>
+		</field>
+		<field name="priv">
+			<type name="CapturePreferencesPrivate" c:type="CaptureCapturePreferencesPrivate*"/>
+		</field>
+		<field name="framerate">
+			<attribute name="description.blurb" value="Framerate for screen capture"/>
+			<attribute name="description.nick" value="framerate"/>
+			<type name="guint" c:type="guint"/>
+		</field>
+		<field name="countdown">
+			<attribute name="description.blurb" value="Nr. of seconds  for countdown"/>
+			<attribute name="description.nick" value="countdown"/>
+			<type name="gint" c:type="gint"/>
+		</field>
+		<field name="file_format">
+			<attribute name="description.blurb" value="Output file format"/>
+			<attribute name="description.nick" value="file-format"/>
+			<type name="utf8" c:type="gchar*"/>
+		</field>
+		<field name="destination">
+			<attribute name="description.blurb" value="Destination path for saving captures"/>
+			<attribute name="description.nick" value="destination"/>
+			<type name="utf8" c:type="gchar*"/>
+		</field>
+		<field name="show_notifications">
+			<attribute name="description.blurb" value="Whether to show notifications"/>
+			<attribute name="description.nick" value="show-notifications"/>
+			<type name="gboolean" c:type="gboolean"/>
+		</field>
+		<field name="copy_to_clipboard">
+			<attribute name="description.blurb" value="Whether to copy screenshots to clipboard"/>
+			<attribute name="description.nick" value="copy-to-clipboard"/>
+			<type name="gboolean" c:type="gboolean"/>
+		</field>
+		<field name="auto_save">
+			<attribute name="description.blurb" value="Whether to auto save captures or ask user"/>
+			<attribute name="description.nick" value="autosave"/>
+			<type name="gboolean" c:type="gboolean"/>
+		</field>
+		<field name="include_pointer">
+			<attribute name="description.blurb" value="Whether to include the mouse pointer"/>
+			<attribute name="description.nick" value="include-pointer"/>
+			<type name="gboolean" c:type="gboolean"/>
+		</field>
+		<constructor name="with_file" c:identifier="capture_capture_preferences_new_with_file">
+			<return-value transfer-ownership="full">
+				<type name="Capture.CapturePreferences" c:type="CaptureCapturePreferences*"/>
+			</return-value>
+			<parameters>
+				<parameter name="file" transfer-ownership="none">
+					<type name="Gio.File" c:type="GFile*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<constructor name="new" c:identifier="capture_capture_preferences_new">
+			<return-value transfer-ownership="full">
+				<type name="Capture.CapturePreferences" c:type="CaptureCapturePreferences*"/>
+			</return-value>
+		</constructor>
+	</class>
+	<record name="CapturePreferencesClass" c:type="CaptureCapturePreferencesClass" glib:is-gtype-struct-for="CapturePreferences">
+		<field name="parent_class">
+			<type name="Plank.DockItemPreferencesClass" c:type="PlankDockItemPreferencesClass"/>
+		</field>
+	</record>
+	<record name="CapturePreferencesPrivate" c:type="CaptureCapturePreferencesPrivate" disguised="1"/>
+	<class name="CapturePreview" c:type="CaptureCapturePreview" glib:type-name="CaptureCapturePreview" glib:get-type="capture_capture_preview_get_type" glib:type-struct="CapturePreviewClass" parent="Gtk.Dialog">
+		<field name="parent_instance">
+			<type name="Gtk.Dialog" c:type="GtkDialog"/>
+		</field>
+		<field name="priv">
+			<type name="CapturePreviewPrivate" c:type="CaptureCapturePreviewPrivate*"/>
+		</field>
+		<field name="sequence">
+			<type name="Capture.Sequence" c:type="CaptureSequence*"/>
+		</field>
+		<constructor name="new" c:identifier="capture_capture_preview_new">
+			<return-value transfer-ownership="none">
+				<type name="Capture.CapturePreview" c:type="CaptureCapturePreview*"/>
+			</return-value>
+			<parameters>
+				<parameter name="sequence" transfer-ownership="none">
+					<type name="Capture.Sequence" c:type="CaptureSequence*"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<method name="run_sequence" c:identifier="capture_capture_preview_run_sequence">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+		</method>
+	</class>
+	<record name="CapturePreviewClass" c:type="CaptureCapturePreviewClass" glib:is-gtype-struct-for="CapturePreview">
+		<field name="parent_class">
+			<type name="Gtk.DialogClass" c:type="GtkDialogClass"/>
+		</field>
+	</record>
+	<record name="CapturePreviewPrivate" c:type="CaptureCapturePreviewPrivate" disguised="1"/>
+	<record name="Countdown">
+		<field name="timer">
+			<type name="gint" c:type="gint"/>
+		</field>
+		<constructor name="new" c:identifier="capture_countdown_new">
+			<return-value transfer-ownership="full">
+				<type name="Capture.Countdown" c:type="CaptureCountdown*"/>
+			</return-value>
+			<parameters>
+				<parameter name="seconds" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<method name="start" c:identifier="capture_countdown_start">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+		</method>
+		<property name="seconds" writable="1">
+			<type name="gint" c:type="gint"/>
+		</property>
+		<method name="get_seconds" c:identifier="capture_countdown_get_seconds">
+			<return-value transfer-ownership="none">
+				<type name="gint" c:type="gint"/>
+			</return-value>
+		</method>
+		<method name="set_seconds" c:identifier="capture_countdown_set_seconds">
+			<return-value transfer-ownership="none">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="value" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+			</parameters>
+		</method>
+		<glib:signal name="tick">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="second" transfer-ownership="none">
+					<type name="gint" c:type="gint"/>
+				</parameter>
+				<parameter name="progress" transfer-ownership="none">
+					<type name="gdouble" c:type="gdouble"/>
+				</parameter>
+			</parameters>
+		</glib:signal>
+		<glib:signal name="ignition">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+		</glib:signal>
+	</record>
+	<class name="RegionSelect" c:type="CaptureRegionSelect" glib:type-name="CaptureRegionSelect" glib:get-type="capture_region_select_get_type" glib:type-struct="RegionSelectClass" parent="Granite.WidgetsCompositedWindow">
+		<field name="parent_instance">
+			<type name="Granite.WidgetsCompositedWindow" c:type="GraniteWidgetsCompositedWindow"/>
+		</field>
+		<field name="priv">
+			<type name="RegionSelectPrivate" c:type="CaptureRegionSelectPrivate*"/>
+		</field>
+		<field name="drawing_area">
+			<type name="Gtk.DrawingArea" c:type="GtkDrawingArea*"/>
+		</field>
+		<field name="mouse">
+			<type name="Gdk.Device" c:type="GdkDevice*"/>
+		</field>
+		<field name="gwin">
+			<type name="Gdk.Window" c:type="GdkWindow*"/>
+		</field>
+		<field name="selection">
+			<type name="Gdk.Rectangle" c:type="GdkRectangle"/>
+		</field>
+		<constructor name="new" c:identifier="capture_region_select_new">
+			<return-value transfer-ownership="none">
+				<type name="Capture.RegionSelect" c:type="CaptureRegionSelect*"/>
+			</return-value>
+		</constructor>
+		<method name="run" c:identifier="capture_region_select_run">
+			<return-value transfer-ownership="full">
+				<type name="Gtk.ResponseType" c:type="GtkResponseType"/>
+			</return-value>
+		</method>
+		<method name="get_selection" c:identifier="capture_region_select_get_selection">
+			<return-value transfer-ownership="none">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="result" direction="out" transfer-ownership="full" caller-allocates="1">
+					<type name="Gdk.Rectangle" c:type="GdkRectangle*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="on_draw" c:identifier="capture_region_select_on_draw">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="ctx" transfer-ownership="none">
+					<type name="cairo.Context" c:type="cairo_t*"/>
+				</parameter>
+			</parameters>
+		</method>
+	</class>
+	<record name="RegionSelectClass" c:type="CaptureRegionSelectClass" glib:is-gtype-struct-for="RegionSelect">
+		<field name="parent_class">
+			<type name="Granite.WidgetsCompositedWindowClass" c:type="GraniteWidgetsCompositedWindowClass"/>
+		</field>
+	</record>
+	<record name="RegionSelectPrivate" c:type="CaptureRegionSelectPrivate" disguised="1"/>
+	<record name="ScreenGrabber">
+		<constructor name="new" c:identifier="capture_screen_grabber_new">
+			<return-value transfer-ownership="full">
+				<type name="Capture.ScreenGrabber" c:type="CaptureScreenGrabber*"/>
+			</return-value>
+			<parameters>
+				<parameter name="mode" transfer-ownership="none">
+					<type name="Capture.ScreenGrabMode" c:type="CaptureScreenGrabMode"/>
+				</parameter>
+				<parameter name="include_cursor" transfer-ownership="none">
+					<type name="gboolean" c:type="gboolean"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<method name="grab" c:identifier="capture_screen_grabber_grab">
+			<return-value transfer-ownership="full">
+				<type name="GdkPixbuf.Pixbuf" c:type="GdkPixbuf*"/>
+			</return-value>
+			<parameters>
+				<parameter name="selection" transfer-ownership="none" allow-none="1">
+					<type name="Gdk.Rectangle" c:type="GdkRectangle*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<constructor name="from_region" c:identifier="capture_screen_grabber_new_from_region">
+			<return-value transfer-ownership="full">
+				<type name="Capture.ScreenGrabber" c:type="CaptureScreenGrabber*"/>
+			</return-value>
+			<parameters>
+				<parameter name="include_cursor" transfer-ownership="none">
+					<type name="gboolean" c:type="gboolean"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<constructor name="from_window" c:identifier="capture_screen_grabber_new_from_window">
+			<return-value transfer-ownership="full">
+				<type name="Capture.ScreenGrabber" c:type="CaptureScreenGrabber*"/>
+			</return-value>
+			<parameters>
+				<parameter name="include_cursor" transfer-ownership="none">
+					<type name="gboolean" c:type="gboolean"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<constructor name="from_desktop" c:identifier="capture_screen_grabber_new_from_desktop">
+			<return-value transfer-ownership="full">
+				<type name="Capture.ScreenGrabber" c:type="CaptureScreenGrabber*"/>
+			</return-value>
+			<parameters>
+				<parameter name="include_cursor" transfer-ownership="none">
+					<type name="gboolean" c:type="gboolean"/>
+				</parameter>
+			</parameters>
+		</constructor>
+		<property name="include-cursor" writable="1">
+			<type name="gboolean" c:type="gboolean"/>
+		</property>
+		<method name="get_include_cursor" c:identifier="capture_screen_grabber_get_include_cursor">
+			<return-value transfer-ownership="none">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+		</method>
+		<method name="set_include_cursor" c:identifier="capture_screen_grabber_set_include_cursor">
+			<return-value transfer-ownership="none">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="value" transfer-ownership="none">
+					<type name="gboolean" c:type="gboolean"/>
+				</parameter>
+			</parameters>
+		</method>
+		<property name="pixbuf" writable="1">
+			<type name="GdkPixbuf.Pixbuf" c:type="GdkPixbuf*"/>
+		</property>
+		<method name="get_pixbuf" c:identifier="capture_screen_grabber_get_pixbuf">
+			<return-value transfer-ownership="none">
+				<type name="GdkPixbuf.Pixbuf" c:type="GdkPixbuf*"/>
+			</return-value>
+		</method>
+		<method name="set_pixbuf" c:identifier="capture_screen_grabber_set_pixbuf">
+			<return-value transfer-ownership="none">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="value" transfer-ownership="none">
+					<type name="GdkPixbuf.Pixbuf" c:type="GdkPixbuf*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<property name="mode" writable="1">
+			<type name="Capture.ScreenGrabMode" c:type="CaptureScreenGrabMode"/>
+		</property>
+		<method name="get_mode" c:identifier="capture_screen_grabber_get_mode">
+			<return-value transfer-ownership="none">
+				<type name="Capture.ScreenGrabMode" c:type="CaptureScreenGrabMode"/>
+			</return-value>
+		</method>
+		<method name="set_mode" c:identifier="capture_screen_grabber_set_mode">
+			<return-value transfer-ownership="none">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="value" transfer-ownership="none">
+					<type name="Capture.ScreenGrabMode" c:type="CaptureScreenGrabMode"/>
+				</parameter>
+			</parameters>
+		</method>
+		<glib:signal name="grabbed">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="pixbuf" transfer-ownership="none" allow-none="1">
+					<type name="GdkPixbuf.Pixbuf" c:type="GdkPixbuf*"/>
+				</parameter>
+			</parameters>
+		</glib:signal>
+	</record>
+	<record name="Sequence">
+		<field name="pixbufs">
+			<type name="GLib.List" c:type="GList*">
+				<type name="GdkPixbuf.Pixbuf" c:type="GdkPixbuf*"/>
+			</type>
+		</field>
+		<constructor name="new" c:identifier="capture_sequence_new">
+			<return-value transfer-ownership="full">
+				<type name="Capture.Sequence" c:type="CaptureSequence*"/>
+			</return-value>
+		</constructor>
+		<method name="add" c:identifier="capture_sequence_add">
+			<return-value transfer-ownership="full">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="pixbuf" transfer-ownership="none">
+					<type name="GdkPixbuf.Pixbuf" c:type="GdkPixbuf*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<method name="length" c:identifier="capture_sequence_length">
+			<return-value transfer-ownership="full">
+				<type name="guint" c:type="guint"/>
+			</return-value>
+		</method>
+		<method name="first" c:identifier="capture_sequence_first">
+			<return-value transfer-ownership="full" allow-none="1">
+				<type name="GdkPixbuf.Pixbuf" c:type="GdkPixbuf*"/>
+			</return-value>
+		</method>
+		<method name="next" c:identifier="capture_sequence_next">
+			<return-value transfer-ownership="full" allow-none="1">
+				<type name="GdkPixbuf.Pixbuf" c:type="GdkPixbuf*"/>
+			</return-value>
+		</method>
+		<method name="previous" c:identifier="capture_sequence_previous">
+			<return-value transfer-ownership="full" allow-none="1">
+				<type name="GdkPixbuf.Pixbuf" c:type="GdkPixbuf*"/>
+			</return-value>
+		</method>
+		<method name="save_to_animated_gif" c:identifier="capture_sequence_save_to_animated_gif">
+			<return-value transfer-ownership="full">
+				<type name="gboolean" c:type="gboolean"/>
+			</return-value>
+			<parameters>
+				<parameter name="filename" transfer-ownership="none">
+					<type name="utf8" c:type="const gchar*"/>
+				</parameter>
+			</parameters>
+		</method>
+		<property name="frame" writable="1">
+			<type name="guint" c:type="guint"/>
+		</property>
+		<method name="get_frame" c:identifier="capture_sequence_get_frame">
+			<return-value transfer-ownership="none">
+				<type name="guint" c:type="guint"/>
+			</return-value>
+		</method>
+		<method name="set_frame" c:identifier="capture_sequence_set_frame">
+			<return-value transfer-ownership="none">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="value" transfer-ownership="none">
+					<type name="guint" c:type="guint"/>
+				</parameter>
+			</parameters>
+		</method>
+		<property name="framerate" writable="1">
+			<type name="guint" c:type="guint"/>
+		</property>
+		<method name="get_framerate" c:identifier="capture_sequence_get_framerate">
+			<return-value transfer-ownership="none">
+				<type name="guint" c:type="guint"/>
+			</return-value>
+		</method>
+		<method name="set_framerate" c:identifier="capture_sequence_set_framerate">
+			<return-value transfer-ownership="none">
+				<type name="none"/>
+			</return-value>
+			<parameters>
+				<parameter name="value" transfer-ownership="none">
+					<type name="guint" c:type="guint"/>
+				</parameter>
+			</parameters>
+		</method>
+	</record>
+	<class name="SettingsDialog" c:type="CaptureSettingsDialog" glib:type-name="CaptureSettingsDialog" glib:get-type="capture_settings_dialog_get_type" glib:type-struct="SettingsDialogClass" parent="Gtk.Dialog">
+		<field name="parent_instance">
+			<type name="Gtk.Dialog" c:type="GtkDialog"/>
+		</field>
+		<field name="priv">
+			<type name="SettingsDialogPrivate" c:type="CaptureSettingsDialogPrivate*"/>
+		</field>
+		<field name="settings">
+			<type name="Gio.Settings" c:type="GSettings*"/>
+		</field>
+		<field name="countdown_spin_button">
+			<type name="Gtk.SpinButton" c:type="GtkSpinButton*"/>
+		</field>
+		<field name="framerate_spin_button">
+			<type name="Gtk.SpinButton" c:type="GtkSpinButton*"/>
+		</field>
+		<field name="include_pointer_checkbutton">
+			<type name="Gtk.CheckButton" c:type="GtkCheckButton*"/>
+		</field>
+		<field name="auto_save_checkbutton">
+			<type name="Gtk.CheckButton" c:type="GtkCheckButton*"/>
+		</field>
+		<field name="show_notifications_checkbutton">
+			<type name="Gtk.CheckButton" c:type="GtkCheckButton*"/>
+		</field>
+		<field name="copy_to_clipboard_checkbutton">
+			<type name="Gtk.CheckButton" c:type="GtkCheckButton*"/>
+		</field>
+		<field name="destination_file_chooser_button">
+			<type name="Gtk.FileChooserButton" c:type="GtkFileChooserButton*"/>
+		</field>
+		<field name="file_format_mode_button">
+			<type name="Granite.WidgetsModeButton" c:type="GraniteWidgetsModeButton*"/>
+		</field>
+		<constructor name="new" c:identifier="capture_settings_dialog_new">
+			<return-value transfer-ownership="none">
+				<type name="Capture.SettingsDialog" c:type="CaptureSettingsDialog*"/>
+			</return-value>
+		</constructor>
+	</class>
+	<record name="SettingsDialogClass" c:type="CaptureSettingsDialogClass" glib:is-gtype-struct-for="SettingsDialog">
+		<field name="parent_class">
+			<type name="Gtk.DialogClass" c:type="GtkDialogClass"/>
+		</field>
+	</record>
+	<record name="SettingsDialogPrivate" c:type="CaptureSettingsDialogPrivate" disguised="1"/>
+	<constant name="G_RESOURCE_PATH" c:identifier="CAPTURE_G_RESOURCE_PATH" value="/de/hannenz/capture">
+		<type name="utf8" c:type="const gchar*"/>
+	</constant>
+</namespace>
+<function name="docklet_init" c:identifier="docklet_init">
+	<return-value transfer-ownership="full">
+		<type name="none"/>
+	</return-value>
+	<parameters>
+		<parameter name="manager" transfer-ownership="none">
+			<type name="Plank.DockletManager" c:type="PlankDockletManager*"/>
+		</parameter>
+	</parameters>
+</function>
+</repository>

@@ -1,5 +1,10 @@
 <schemalist>
 	<schema id="de.hannenz.capture" path="/de/hannenz/capture/" gettext-domain="capture">
+		<key name="foo" type="s">
+			<default>"bar"</default>
+			<summary>Test</summary>
+			<description>Test</description>
+		</key>
 		<key name="mode" type="s">
 			<choices>
 				<choice value="Screenshot" />

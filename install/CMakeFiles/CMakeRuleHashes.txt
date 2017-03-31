@@ -1,0 +1,5 @@
+# Hashes of file build rules.
+927a057706deb277c7d7407a42b06882 src/Capture_valac.stamp
+2db7d75390f2c26f5667d04c62f1297e src/Config.c
+64274e4d18c877d55b6995f4a289202b src/capture_valac.stamp
+639b09549713e3220a2c0fba69e7ed2e src/docklet-capture_valac.stamp
